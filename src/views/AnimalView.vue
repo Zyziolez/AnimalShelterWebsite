@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 const route = useRoute()
-
 // console.log(route.params)
 fetch(`https://localhost:5001/api/Animals/${route.params.animalId}`, {
      headers: {
