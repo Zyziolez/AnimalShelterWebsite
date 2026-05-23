@@ -37,6 +37,7 @@ export function useAnimals() {
     try {
       const response = await fetch('https://localhost:5001/api/Animals')
       simpleAnimals.value = await response.json()
+      // console.log(simpleAnimals.value)
     } finally {
       loading.value = false
     }

@@ -28,8 +28,8 @@
       <div className="mx-2 flex-1 px-2">Admin Panel</div>
       <div className="hidden flex-none lg:block">
         <ul className="menu menu-horizontal">
-          <li><button className="btn btn-ghost">Panel</button></li>
-          <li><button className="btn btn-ghost">Formularze</button></li>
+          <li><RouterLink to="/admin" ><button className="btn btn-ghost" >Dashboard</button></RouterLink></li>
+          <li><RouterLink to="/admin/forms"><button className="btn btn-ghost">Formularze</button></RouterLink></li>
           
         </ul>
       </div>

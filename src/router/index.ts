@@ -17,12 +17,24 @@ const router = createRouter({
     {
        path: '/login',
       name: 'login',
-      component: () => import('@/views/LoginView.vue')
+      component: () => import('@/views/adminpanel/LoginView.vue')
     },
     {
         path: '/admin',
         name: 'admin',
-        component: () => import('@/views/AdminView.vue')
+        component: () => import('@/views/adminpanel/AdminView.vue'),
+        children: [
+          {
+            path: '',
+            name: 'admin-dashboard',
+            component: () => import('@/views/adminpanel/AdminDashboardView.vue')
+          },
+          {
+            'path': 'forms',
+            'name': 'admin-forms',
+            'component': () => import('@/views/adminpanel/AdminFormsView.vue')
+          }
+        ]
     }
 
   ],
