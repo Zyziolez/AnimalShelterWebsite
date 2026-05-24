@@ -12,7 +12,8 @@ export function useAnimals() {
     loading.value = true
     try {
       const response = await fetch('https://localhost:5001/api/Cards')
-      animals.value = await response.json()
+      // console.log(response.json())
+      animals.value = await response.json() as AnimalCard[]
     } finally {
       loading.value = false
     }
@@ -23,7 +24,7 @@ export function useAnimals() {
     loading.value = true
     try {
       const response = await fetch(`https://localhost:5001/api/Animals/${id}`)
-      singleAnimal.value = await response.json()
+      singleAnimal.value = await response.json() as Animal
     } catch (err) {
       console.error("Błąd pobierania zwierzaka:", err)
     } finally {
@@ -36,8 +37,11 @@ export function useAnimals() {
     loading.value = true
     try {
       const response = await fetch('https://localhost:5001/api/Animals')
-      simpleAnimals.value = await response.json()
+      simpleAnimals.value = await response.json() as Animal[]
       // console.log(simpleAnimals.value)
+    }
+    catch{
+      console.error("Błąd pobierania fetchSimpleAnimals")
     } finally {
       loading.value = false
     }
