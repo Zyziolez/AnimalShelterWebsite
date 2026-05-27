@@ -6,6 +6,7 @@ import SearchBar from '@/components/adminpanel/SearchBar.vue';
 import AnimalListCommponent from '@/components/AnimalListCommponent.vue';
 import UploadPhoto from '@/components/adminpanel/UploadPhoto.vue';
 import AddAnimalModal from '@/components/adminpanel/AddAnimalModal.vue';
+import {Animal} from '@/types/index.ts'
 
 const { simpleAnimals, fetchSimpleAnimals } = useAnimals()
 onMounted(async () => {
@@ -24,6 +25,7 @@ function openAddAnimalModal(val: boolean){
   // modal.showModal()
 }
 
+// const animalTest = ref<Animal>({ name: 'Dominik', description: 'Przyjacielski pies', sex: 'M', age: 5, species: 'Pies' })
 </script>
 <template>
     <div >
@@ -37,7 +39,10 @@ function openAddAnimalModal(val: boolean){
     </div> -->
 <ul className="list bg-base-100 rounded-box shadow-md">
 
-  <AnimalListCommponent/>
+  <!-- <AnimalListCommponent :animal="animalTest" /> -->
+  <template v-for="animal in simpleAnimals" :key="animal.id">
+    <AnimalListCommponent :animal="animal" />
+    </template>
 </ul>
   
 <div class="w-full flex justify-center mt-5" >
@@ -50,5 +55,5 @@ function openAddAnimalModal(val: boolean){
     <!-- <UploadPhoto/> -->
     </div>
     </div>
-    <AddAnimalModal @add-animal-modal="openAddAnimalModal" />
+    <AddAnimalModal @add-animal-modal="openAddAnimalModal"  />
 </template>

@@ -1,15 +1,29 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import {Animal} from '@/types/index.ts'
 
+const props = defineProps<{
+  animal: Animal
+}>();
 
 </script>
 <template>
     <li className="list-row">
-    <div><img className="size-10 rounded-box" src="https://img.daisyui.com/images/profile/demo/1@94.webp"/></div>
     <div>
-      <div>Dio Lupa</div>
-      <div className="text-xs uppercase font-semibold opacity-60">Remaining Reason</div>
+      <img v-if="props.animal.photos" className="size-10 rounded-box" :src="props.animal.photos[0].apiLink"/>
+      <img v-else-if="props.animal.species == 'Pies'" className="size-10 rounded-box" src="@/assets/images/dog.png"/>
+      <img v-else className="size-10 rounded-box" src="@/assets/images/cat.png"/>
+
+    </div>
+    <div>
+      <div class="flex align-items-center" >
+        {{ props.animal.name }} 
+        <Icon v-if='props.animal.sex == "M"' icon='mdi:gender-male' />
+        <Icon v-else icon='mdi:gender-female' /></div>
+      <div className="text-xs font-semibold opacity-60">{{ props.animal.description }}</div>
+      
+
     </div>
     <!-- <p className="list-col-wrap text-xs">
       "Remaining Reason" became an instant hit, praised for its haunting sound and emotional depth. A viral performance brought it widespread recognition, making it one of Dio Lupa’s most iconic tracks.
