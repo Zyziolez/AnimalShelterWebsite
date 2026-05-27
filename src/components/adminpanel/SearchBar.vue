@@ -1,14 +1,23 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+// import { Icon } from '@iconify/vue'
+
+const _emit = defineEmits<{
+  addAnimalModal: [modalOpen: boolean]
+}>()
+
+function openAddAnimalModal(){
+  _emit('addAnimalModal', true)
+}
+
 </script>
 <template>
     <div >
-  <div>
-    <h2>Zwierzaki w bazie</h2>
+  <div class="flex gap-5" >
+    <h1 class="flex-4 text-2xl" >Zwierzaki w bazie</h1>
+    <input type="text"  placeholder="Wyszukaj..." class="input input-bordered flex-4" />
+    <button @click="openAddAnimalModal" class="btn btn-primary flex-1" >Dodaj</button>
   </div>
   <div >
-    <input type="text" placeholder="Wyszukaj..." class="input input-bordered w-full" />
-    <h2 class="mt-6" >Sortuj</h2>
     
     <div class="flex gap-4" >
             <fieldset className="fieldset">

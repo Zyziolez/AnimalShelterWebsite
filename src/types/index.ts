@@ -7,7 +7,7 @@ export interface Photo {
 }
 
 export interface Animal {
-  animalId: number
+  animalId?: number
   species: string
   name: string
   age: number
