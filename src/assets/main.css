@@ -1,2 +1,32 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 @plugin "daisyui";
+
+*{
+    color: black;
+    font-family: "Nunito", sans-serif;
+}
+.btn, textarea, input, select{
+    background-color: #FBFBFB;
+    border: 1px solid black;
+    color: black;
+}
+div,  li, ul{
+    background-color: #FBFBFB;
+    box-shadow: none;
+
+}
+footer{
+    background-color: #E5EEFF;
+}
+.btn, .btn-soft, .btn-accent :hover{
+    box-shadow:  0 4px 6px -1px rgba(142, 142, 142, 0.1), 0 2px 4px -2px rgba(103, 103, 103, 0.1)
+}
+.btn-ghost{
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+.menu{
+    background-color: #E5EEFF;
+}

@@ -17,6 +17,7 @@
     </svg>
     <p>Póżniej naprawię tą stopkę</p>
   </aside>
+  <img src="@/assets/images/stupcia.png" class="h-20" />
   <nav className="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
     <a>
       <svg

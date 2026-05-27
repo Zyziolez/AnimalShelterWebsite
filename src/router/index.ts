@@ -4,16 +4,30 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    
     {
+      path: '/',
+      name: 'user',
+      component: () => import('@/views/MainUserView.vue'),
+      children: [
+{
       path: '/',
       name: 'home',
       component: HomeView
     },
-    {
+     {
       path: '/animal/:animalId',
       name: 'animal',
       component: () => import('@/views/AnimalView.vue')
     },
+     {
+      path: '/kontakt',
+      name: 'contact',
+      component: () => import('@/views/ContactView.vue')
+    },
+      ]
+    },
+   
     {
        path: '/login',
       name: 'login',
@@ -35,6 +49,12 @@ const router = createRouter({
             'component': () => import('@/views/adminpanel/AdminFormsView.vue')
           }
         ]
+    },
+   
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue')
     }
 
   ],
