@@ -4,24 +4,33 @@ import { useAnimals } from '@/composables/useAnimals'
 // import AnimalCard from '@/components/AnimalCard.vue';
 import SearchBar from '@/components/adminpanel/SearchBar.vue';
 import AnimalListCommponent from '@/components/AnimalListCommponent.vue';
-import UploadPhoto from '@/components/adminpanel/UploadPhoto.vue';
+// import UploadPhoto from '@/components/adminpanel/UploadPhoto.vue';
 import AddAnimalModal from '@/components/adminpanel/AddAnimalModal.vue';
 import {Animal} from '@/types/index.ts'
 
 const { simpleAnimals, fetchSimpleAnimals } = useAnimals()
 onMounted(async () => {
   await fetchSimpleAnimals()
-  console.log(simpleAnimals.value)
+  // console.log(simpleAnimals.value)
 })
+const selectedAnimal = ref<Animal | undefined>(undefined)
 
 const pageNumber = ref(1)
 function changePage(val: number){
   if(pageNumber.value == 0 && val == -1) return
   pageNumber.value += val
 }
-function openAddAnimalModal(val: boolean){
+function openAddAnimalModal(show: boolean, animal?: Animal){
+  // console.log('emit u rodzica aktywowany')
   const modal = document.getElementById('add-animal') as HTMLDialogElement
-  val ? modal.showModal() : modal.close()
+  if (animal) {
+    selectedAnimal.value = animal
+    // console.log(animal)
+  }
+  if(show){
+    console.log('otwieram modal')
+  }
+  show ? modal.showModal() : modal.close()
   // modal.showModal()
 }
 
@@ -41,7 +50,7 @@ function openAddAnimalModal(val: boolean){
 
   <!-- <AnimalListCommponent :animal="animalTest" /> -->
   <template v-for="animal in simpleAnimals" :key="animal.id">
-    <AnimalListCommponent :animal="animal" />
+    <AnimalListCommponent :animal="animal" @add-animal-modal="openAddAnimalModal" />
     </template>
 </ul>
   
@@ -55,5 +64,5 @@ function openAddAnimalModal(val: boolean){
     <!-- <UploadPhoto/> -->
     </div>
     </div>
-    <AddAnimalModal @add-animal-modal="openAddAnimalModal"  />
+    <AddAnimalModal @add-animal-modal="openAddAnimalModal" :animal="selectedAnimal"  />
 </template>

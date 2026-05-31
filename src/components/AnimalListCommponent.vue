@@ -6,6 +6,15 @@ import {Animal} from '@/types/index.ts'
 const props = defineProps<{
   animal: Animal
 }>();
+const _emit = defineEmits<{
+  addAnimalModal: [modalOpen: boolean, animal?: Animal]
+}>()
+
+function edit(){
+  // console.log('gowno')
+  _emit('addAnimalModal', true, props.animal)
+}
+
 
 </script>
 <template>
@@ -28,7 +37,7 @@ const props = defineProps<{
     <!-- <p className="list-col-wrap text-xs">
       "Remaining Reason" became an instant hit, praised for its haunting sound and emotional depth. A viral performance brought it widespread recognition, making it one of Dio Lupa’s most iconic tracks.
     </p> -->
-    <button className="btn btn-square btn-ghost">
+    <button className="btn btn-square btn-ghost" @click="edit()">
       <Icon icon="mdi-light:pencil" />
     </button>
     <button className="btn btn-square btn-ghost">

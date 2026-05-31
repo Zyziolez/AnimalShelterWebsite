@@ -4,7 +4,7 @@
 </script>
 <template>
         <div>
-        <div className="drawer">
+        <div className="drawer blue-back">
   <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
   <div className="drawer-content flex flex-col">
     <div className="navbar bg-base-300 w-full">

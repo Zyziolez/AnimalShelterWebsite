@@ -1,33 +1,61 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import AnimalPostForm from './AnimalPostForm.vue';
 import UploadPhoto from './UploadPhoto.vue';
 import {Animal} from '@/types/index.ts'
 
-const _emit = defineEmits<{
-  addAnimalModal: [modalOpen: boolean]
-}>()
-
-const showPostForm = ref(false)
-const formData = ref<Animal>({
+const props = withDefaults(defineProps<{
+  animal?: Animal
+}>(), {
+  animal: () => ({
+    animalId: -1,
     species: '',
     name: '',
     age: 0,
     sex: '',
-    description: ''
-
+    description: '',
+    photos: [],
+    card: null
+  })
 })
+const _emit = defineEmits<{
+  addAnimalModal: [modalOpen: boolean]
+}>()
+
+
+const showPostForm = ref(false)
+const formData = ref<Animal>(props.animal)
 
 function addAnimalFunction(){
     console.log(formData.value)
 }
+function closeModal(){
+ formData.value =  {
+      animalId: -1,
+      species: '',
+      name: '',
+      age: 0,
+      sex: '',
+      description: '',
+      photos: [],
+      card: null
+    }
+  _emit('addAnimalModal', false)
+}
+
+watch(() => props.animal,(newVal: Animal) =>{
+    formData.value = newVal
+}, {deep: true})
 
 </script>
 <template>
     <dialog id="add-animal" className="modal modal-bottom sm:modal-middle">
   <div className="modal-box">
-    <h3 className="font-bold text-lg">Dodaj zwierzę do bazy</h3>
-<!-- inputy -->
+    <div class="flex justify-between" >
+        <h3 className="font-bold text-lg">Dodaj zwierzę do bazy</h3>
+        <button className="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
+</div>
+    <!-- inputy -->
     <fieldset className="fieldset">
         <legend className="fieldset-legend">Imię</legend>
         <input type="text" className="input" placeholder="Reksio" v-model="formData.name" />
@@ -41,6 +69,7 @@ function addAnimalFunction(){
         <option  >Pies</option>
         <option>Kot</option>
         <option>Inne</option>
+        <!-- <option>Cat</option> -->
     </select>
     </fieldset>
 
@@ -72,14 +101,14 @@ function addAnimalFunction(){
         <textarea className="textarea" placeholder="Opis zwierzaka..." v-model="formData.description"></textarea>
         </fieldset>
 
-<UploadPhoto/>
+<!-- <UploadPhoto/> -->
 
 <!-- otwiera form ogłoszenia -->
     <label className="label mt-5" >
-    <input type="checkbox"  className="checkbox" @click="showPostForm = !showPostForm" />
+    <input type="checkbox"  className="checkbox" @click="() => {formData.card = { id: -1, status: '', date: 0}}" />
     Dodaj ogłoszenie
   </label>
-  <AnimalPostForm v-if="showPostForm"/>
+  <AnimalPostForm v-if="props.animal.card != undefined"/>
   <!-- zamkniecie -->
     <div className="modal-action">
       <form method="dialog">
