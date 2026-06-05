@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import AnimalPostForm from './AnimalPostForm.vue';
-import UploadPhoto from './UploadPhoto.vue';
+// import UploadPhoto from './UploadPhoto.vue';
 import {Animal} from '@/types/index.ts'
+import { useAnimals } from '@/composables/useAnimals'
+
+const {postAnimal} = useAnimals()
 
 const props = withDefaults(defineProps<{
   animal?: Animal
@@ -23,15 +26,27 @@ const _emit = defineEmits<{
 }>()
 
 
-const showPostForm = ref(false)
+// const showPostForm = ref(false)
 const formData = ref<Animal>(props.animal)
 
 function addAnimalFunction(){
-    console.log(formData.value)
+  const postAnimalData = {
+  animalId: 0,
+  species: formData.value.species,
+  name: formData.value.name,
+  age: formData.value.age,
+  sex: formData.value.sex,
+  description: formData.value.description,
+  photos: []
+
+  } as Animal
+  postAnimal(postAnimalData)
 }
+
+
 function closeModal(){
  formData.value =  {
-      animalId: -1,
+      animalId: 0,
       species: '',
       name: '',
       age: 0,
@@ -49,35 +64,32 @@ watch(() => props.animal,(newVal: Animal) =>{
 
 </script>
 <template>
-    <dialog id="add-animal" className="modal modal-bottom sm:modal-middle">
-  <div className="modal-box">
+    <dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
     <div class="flex justify-between" >
-        <h3 className="font-bold text-lg">Dodaj zwierzę do bazy</h3>
-        <button className="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
+        <h3 class="font-bold text-lg">Dodaj zwierzę do bazy</h3>
+        <button class="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
 </div>
     <!-- inputy -->
-    <fieldset className="fieldset">
-        <legend className="fieldset-legend">Imię</legend>
-        <input type="text" className="input" placeholder="Reksio" v-model="formData.name" />
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Imię</legend>
+        <input type="text" class="input" placeholder="Reksio" v-model="formData.name" />
     </fieldset>
     
-    <fieldset className="fieldset">
-        <legend className="fieldset-legend">Gatunek</legend>
-        <select defaultValue="Gatunek" className="select" v-model="formData.species">
-
-        <option disabled='true'>Gatunek</option>
-        <option  >Pies</option>
-        <option>Kot</option>
-        <option>Inne</option>
-        <!-- <option>Cat</option> -->
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Gatunek</legend>
+        <select  class="select" v-model="formData.species">
+        <option disabled='true' value="">Gatunek</option>
+        <option value="Pies" >Pies</option>
+        <option value="Kot">Kot</option>
     </select>
     </fieldset>
 
-    <fieldset className="fieldset">
-        <legend className="fieldset-legend">Wiek</legend>
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Wiek</legend>
         <input
             type="number"
-            className="input validator"
+            class="input validator"
             required
             placeholder="Wiek (w latach)"
             min="0"
@@ -85,36 +97,36 @@ watch(() => props.animal,(newVal: Animal) =>{
             v-model="formData.age"
             />
     </fieldset>
-    <fieldset className="fieldset">
-        <legend className="fieldset-legend">Płeć</legend>
-        <label className="label mt-5">
-            <input type="radio" name="sex" v-model="formData.sex" value="M" className="radio" defaultChecked />
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Płeć</legend>
+        <label class="label mt-5">
+            <input type="radio" name="sex" v-model="formData.sex" value="M" class="radio" defaultChecked />
             Samiec
         </label>
-        <label className="label mt-5">
-            <input type="radio" name="sex" v-model="formData.sex" value="F" className="radio" />
+        <label class="label mt-5">
+            <input type="radio" name="sex" v-model="formData.sex" value="F" class="radio" />
             Samica
         </label>
     </fieldset>
-    <fieldset className="fieldset">
-        <legend className="fieldset-legend">Opis</legend>
-        <textarea className="textarea" placeholder="Opis zwierzaka..." v-model="formData.description"></textarea>
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Opis</legend>
+        <textarea class="textarea" placeholder="Opis zwierzaka..." v-model="formData.description"></textarea>
         </fieldset>
 
 <!-- <UploadPhoto/> -->
 
 <!-- otwiera form ogłoszenia -->
-    <label className="label mt-5" >
-    <input type="checkbox"  className="checkbox" @click="() => {formData.card = { id: -1, status: '', date: 0}}" />
+    <label class="label mt-5" >
+    <input type="checkbox"  class="checkbox" @click="() => {formData.card = { id: -1, status: '', date: 0}}" />
     Dodaj ogłoszenie
   </label>
   <AnimalPostForm v-if="props.animal.card != undefined"/>
   <!-- zamkniecie -->
-    <div className="modal-action">
+    <div class="modal-action">
       <form method="dialog">
-        <button className="btn">Anuluj</button>
+        <button class="btn">Anuluj</button>
       </form>
-      <button className="btn" @click="addAnimalFunction" >Zapisz</button>
+      <button class="btn" @click="addAnimalFunction" >Zapisz</button>
     </div>
   </div>
 

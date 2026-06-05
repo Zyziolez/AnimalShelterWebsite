@@ -1,12 +1,22 @@
 <script setup lang="ts">
 // import { Icon } from '@iconify/vue'
+import {ref} from 'vue'
 
 const _emit = defineEmits<{
-  addAnimalModal: [modalOpen: boolean]
+  addAnimalModal: [modalOpen: boolean],
+  fetchAnimalNameEmit: [searchValue: string, sex: string, species: string]
 }>()
+
 
 function openAddAnimalModal(){
   _emit('addAnimalModal', true)
+}
+const searchBarValue = ref('')
+const selectedSex = ref('')
+const selectedSpecies = ref('')
+
+function searchAnimal (){
+  _emit('fetchAnimalNameEmit', searchBarValue.value, selectedSex.value, selectedSpecies.value)
 }
 
 </script>
@@ -14,31 +24,25 @@ function openAddAnimalModal(){
     <div >
   <div class="flex gap-5" >
     <h1 class="flex-4 text-2xl" >Zwierzaki w bazie</h1>
-    <input type="text"  placeholder="Wyszukaj..." class="input input-bordered flex-4" />
+    <input v-model="searchBarValue" @input="searchAnimal" type="text"  placeholder="Wyszukaj..." class="input input-bordered flex-4" />
     <button @click="openAddAnimalModal" class="btn btn-primary flex-1" >Dodaj</button>
   </div>
   <div >
     
     <div class="flex gap-4" >
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Gatunek</legend>
-            <details className="dropdown">
-                <summary className="m-1">Wszystkie gatunki</summary>
-                <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                    <li><a>Kot</a></li>
-                    <li><a>Pies</a></li>
-                </ul>
-                </details>
+            <fieldset class="fieldset">
+                <select v-model="selectedSex" class="select select-ghost" @change="searchAnimal" >
+                  <option value="" >Wszystkie płcie</option>
+                  <option value="F" >Samice</option>
+                  <option value="M">Samce</option>
+                </select>
          </fieldset>
-         <fieldset className="fieldset">
-                <legend className="fieldset-legend">Płeć</legend>
-            <details className="dropdown">
-                <summary className="m-1">Wszystkie płcie</summary>
-                <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                    <li><a>Samica</a></li>
-                    <li><a>Samiec</a></li>
-                </ul>
-                </details>
+         <fieldset class="fieldset">
+             <select v-model="selectedSpecies" class="select select-ghost" @change="searchAnimal" >
+              <option value="" >Wszystkie gatunki</option>
+              <option value="Kot" >Koty</option>
+              <option value="Pies">Psy</option>
+            </select>
          </fieldset>
 
     </div>

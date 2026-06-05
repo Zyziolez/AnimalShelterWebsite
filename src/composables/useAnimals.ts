@@ -1,11 +1,13 @@
 import { ref } from 'vue'
-import type { AnimalCard, Animal } from '@/assets/AnimalCard'
+import type { AnimalCard, Animal } from '@/types/index'
 
-export function useAnimals() {
-  const animals = ref<AnimalCard[]>([]) // Dla listy
+const animals = ref<AnimalCard[]>([]) // Dla listy
   const singleAnimal = ref<Animal | null>(null) // Dla detali jednego zwierzaka
   const loading = ref(false)
-  const simpleAnimals = ref<Animal[]>([]) // zwierzeta bez kart
+  const filteredAnimals = ref<Animal[]>([]) 
+  const animalsList = ref<Animal[]>([])
+
+export function useAnimals() {
 
   // 1. Pobieranie całej listy kart
   const fetchCards = async () => {
@@ -32,28 +34,76 @@ export function useAnimals() {
     }
   }
 
-  //wszystkie zwierzeta - dla panelu admina
-  const fetchSimpleAnimals = async () => {
+  const fetchAnimals = async () => {
     loading.value = true
     try {
       const response = await fetch('https://localhost:5001/api/Animals')
-      simpleAnimals.value = await response.json() as Animal[]
-      // console.log(simpleAnimals.value)
-    }
-    catch{
-      console.error("Błąd pobierania fetchSimpleAnimals")
+      animalsList.value = await response.json() as Animal[]
+    } catch (err) {
+      console.error("Błąd pobierania zwierzaków:", err)
     } finally {
       loading.value = false
     }
   }
 
+  const fetchAnimalsFiltered = async(searchValue: string, sex: string, species: string) => {
+    loading.value = true
+    try {
+      const response = await fetch('https://localhost:5001/api/Animals/search?query=' + searchValue)
+      filteredAnimals.value = await response.json() as Animal[]
+    }
+    catch{
+      console.error("Błąd w przefiltrowanych zwierzetach")
+    } finally {
+      loading.value = false
+    }
+  }
+  const postAnimal = async (animalData: Animal) => {
+    loading.value = true
+    try {
+      const response = await fetch('https://localhost:5001/api/Animals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(animalData)
+      })
+      if (!response.ok) {
+        throw new Error('Błąd podczas dodawania zwierzaka')
+      }
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
+const deleteAnimalEndpoint = async (animalId: number) => {
+  loading.value = true
+  try {
+    const response = await fetch(`https://localhost:5001/api/Animals/${animalId}`, {
+      method: 'DELETE'
+    })
+    if (!response.ok) {
+      throw new Error('Błąd podczas usuwania zwierzaka')
+    }
+  } catch (err) {
+    console.error("Błąd podczas usuwania zwierzaka:", err)
+  } finally {
+    loading.value = false
+  }
+}
+
   return {
     animals,
     singleAnimal,
     loading,
-    simpleAnimals,
+    filteredAnimals,
+    animalsList,
     fetchCards,
     fetchAnimalById,
-    fetchSimpleAnimals
+    fetchAnimalsFiltered,
+    fetchAnimals,
+    postAnimal,
+    deleteAnimalEndpoint
   }
 }
