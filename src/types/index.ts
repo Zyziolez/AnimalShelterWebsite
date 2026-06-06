@@ -1,8 +1,10 @@
 export interface Photo {
   id: number
   main: boolean
-  apiLink: string
+  imageData?: string | null
+  base64Data?: string | null
   animalId: number
+  imageExtension: string
   animal?: Animal
 }
 
@@ -17,7 +19,8 @@ export interface Animal {
   card?: {
     id: number
     status: string
-    date: number
+    date: number,
+    animalId: number
   } | null
 }
 
@@ -26,5 +29,4 @@ export interface AnimalCard {
   date: number
   status: string
   animalId: number
-  animal: Animal
 }

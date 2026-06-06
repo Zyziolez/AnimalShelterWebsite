@@ -93,17 +93,63 @@ const deleteAnimalEndpoint = async (animalId: number) => {
   }
 }
 
-  return {
-    animals,
-    singleAnimal,
-    loading,
-    filteredAnimals,
-    animalsList,
-    fetchCards,
-    fetchAnimalById,
-    fetchAnimalsFiltered,
-    fetchAnimals,
-    postAnimal,
-    deleteAnimalEndpoint
+const postCard = async (cardData: Card) => {
+  loading.value = true
+  try {
+    const response = await fetch('https://localhost:5001/api/Cards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cardData)
+    })
+
+    if (!response.ok) {
+      throw new Error('Błąd podczas dodawania karty')
+    }
+
+    return await response.json() as Card
   }
+  catch (err) {
+    console.error("Błąd podczas dodawania karty:", err)
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+const deleteCardEndpoint = async (cardId: number) => {
+  loading.value = true
+  try {
+    const response = await fetch(`https://localhost:5001/api/Cards/${cardId}`, {
+      method: 'DELETE'
+    })
+
+    if (!response.ok) {
+      throw new Error('Błąd podczas usuwania karty')
+    }
+  }
+  catch (err) {
+    console.error("Błąd podczas usuwania karty:", err)
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+return {
+  animals,
+  singleAnimal,
+  loading,
+  filteredAnimals,
+  animalsList,
+  fetchCards,
+  fetchAnimalById,
+  fetchAnimalsFiltered,
+  fetchAnimals,
+  postAnimal,
+  deleteAnimalEndpoint,
+  postCard,
+  deleteCardEndpoint
+}
 }

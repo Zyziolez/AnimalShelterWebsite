@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
   animal?: Animal
 }>(), {
   animal: () => ({
-    animalId: -1,
+    animalId: 0,
     species: '',
     name: '',
     age: 0,
@@ -43,6 +43,18 @@ function addAnimalFunction(){
   postAnimal(postAnimalData)
 }
 
+function toggleCardStatus(){
+  if(formData.value.card){
+    formData.value.card = null
+  }else{
+    formData.value.card = { id: 0, status: '', date: 0, animalId: formData.value.animalId}
+  }
+}
+function addCardInfo(status: string){
+  if(formData.value.card){
+    formData.value.card.status = status
+  }
+}
 
 function closeModal(){
  formData.value =  {
@@ -117,10 +129,10 @@ watch(() => props.animal,(newVal: Animal) =>{
 
 <!-- otwiera form ogłoszenia -->
     <label class="label mt-5" >
-    <input type="checkbox"  class="checkbox" @click="() => {formData.card = { id: -1, status: '', date: 0}}" />
+    <input type="checkbox" :checked="props.animal.card != null" class="checkbox" @click="toggleCardStatus" />
     Dodaj ogłoszenie
   </label>
-  <AnimalPostForm v-if="props.animal.card != undefined"/>
+  <AnimalPostForm v-if="props.animal.card != null" @add-animal-post="addCardInfo" />
   <!-- zamkniecie -->
     <div class="modal-action">
       <form method="dialog">

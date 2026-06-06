@@ -13,20 +13,22 @@ const animals = ref<Animal[]>([])
 
 onMounted(async () => {
   await fetchAnimals()
-  console.log(animalsList.value)
+  // console.log(animalsList.value)
   animals.value = [...animalsList.value]
 })
 const selectedAnimal = ref<Animal | undefined>(undefined)
 
-// const pageNumber = ref(1)
-// function changePage(val: number){
-//   if(pageNumber.value == 0 && val == -1) return
-//   pageNumber.value += val
-// }
-
-function openAddAnimalModal(show: boolean, animal?: Animal){
+function openAddAnimalModal(show: boolean, addCard: boolean, animal?: Animal){
   const modal = document.getElementById('add-animal') as HTMLDialogElement
   if (animal) {
+    if(addCard){
+      animal.card = {
+        id: 0,
+        date: Date.now(),
+        status: 'active',
+        animalId: animal.animalId!,
+      }
+    }
     selectedAnimal.value = animal
   }
   if(show){
@@ -46,6 +48,11 @@ function serachAnimalByName(searchValue: string, sex: string, species: string){
     const matchesSpecies = species ? animal.species === species : true
     return matchesName && matchesSex && matchesSpecies
   })
+}
+
+function editAnimal(animal: Animal){
+  selectedAnimal.value = animal
+  // openAddAnimalModal(true, animal.card != null, animal)
 }
 // const animalTest = ref<Animal>({ name: 'Dominik', description: 'Przyjacielski pies', sex: 'M', age: 5, species: 'Pies' })
 </script>

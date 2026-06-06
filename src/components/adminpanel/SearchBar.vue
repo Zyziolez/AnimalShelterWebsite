@@ -3,13 +3,13 @@
 import {ref} from 'vue'
 
 const _emit = defineEmits<{
-  addAnimalModal: [modalOpen: boolean],
+  addAnimalModal: [modalOpen: boolean, addCard: boolean],
   fetchAnimalNameEmit: [searchValue: string, sex: string, species: string]
 }>()
 
 
 function openAddAnimalModal(){
-  _emit('addAnimalModal', true)
+  _emit('addAnimalModal', true, false)
 }
 const searchBarValue = ref('')
 const selectedSex = ref('')
