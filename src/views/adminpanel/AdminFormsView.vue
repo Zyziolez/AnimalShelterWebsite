@@ -35,7 +35,7 @@ const adoptionForms = ref<AdoptionForm[]>([
 </script>
 
 <template>
-  <div class="mt-4 w-4/5 mx-auto">
+  <div class="mt-4 w-4/5 mx-auto pb-10">
     <div class="mb-6">
       <h1 class="text-3xl font-bold">Formularze adopcyjne</h1>
 

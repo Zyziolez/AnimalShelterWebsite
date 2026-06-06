@@ -3,7 +3,7 @@ import MenuComponent from '@/components/MenuComponent.vue';
 
 </script>
 <template>
-    <div>
+    <div class="white-back" >
         <MenuComponent/>
         <RouterView/>
     </div>

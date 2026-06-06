@@ -34,7 +34,7 @@ function deleteCard(){
 
 </script>
 <template>
-    <li class="list-row">
+    <li class="list-row gray-back">
     <div>
       <img
   v-if="props.animal.photos?.[0]?.imageData"

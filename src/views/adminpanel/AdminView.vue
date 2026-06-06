@@ -8,7 +8,7 @@ import AdminMenu from '@/components/adminpanel/AdminMenu.vue';
 </script>
 <template>
 
-   <div>
+   <div class="white-back" >
     <AdminMenu/> 
    <RouterView/>
    </div>

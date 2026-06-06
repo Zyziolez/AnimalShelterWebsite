@@ -66,7 +66,7 @@ const submitForm = async () => {
 </script>
 
 <template>
-  <div style="padding: 20px; font-family: sans-serif;">
+  <div style="padding: 20px; font-family: sans-serif;" class="white-back page-user">
     
     <div v-if="errorMsg" style="color: red; font-weight: bold;">
       {{ errorMsg }}

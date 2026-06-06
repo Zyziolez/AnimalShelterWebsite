@@ -8,10 +8,11 @@ import AnimalListCommponent from '@/components/AnimalListCommponent.vue';
 import AddAnimalModal from '@/components/adminpanel/AddAnimalModal.vue';
 import {Animal} from '@/types/index.ts'
 
-const { animalsList, fetchAnimals, deleteAnimalEndpoint } = useAnimals()
+const { animalsList, fetchAnimals, deleteAnimalEndpoint, loading } = useAnimals()
 const animals = ref<Animal[]>([])
 
 onMounted(async () => {
+  
   await fetchAnimals()
   // console.log(animalsList.value)
   animals.value = [...animalsList.value]
@@ -57,7 +58,7 @@ function editAnimal(animal: Animal){
 // const animalTest = ref<Animal>({ name: 'Dominik', description: 'Przyjacielski pies', sex: 'M', age: 5, species: 'Pies' })
 </script>
 <template>
-    <div >
+    <div class="white-back page-user " >
         <div class=" mt-4 justify-center  w-4/5 mx-auto">
       
            <div  >
@@ -66,10 +67,12 @@ function editAnimal(animal: Animal){
     <!-- <div class="flex gap-4 mt-4 justify-center flex-wrap">
         
     </div> -->
-<ul class="list bg-base-100 rounded-box shadow-md">
-
+<ul class="list bg-base-100 rounded-box white-back pb-10">
+  <div v-if="loading" class="w-full flex justify-center mt-10 mb-10" >
+    <span class="loading loading-spinner loading-lg"></span>
+  </div>
   <!-- <AnimalListCommponent :animal="animalTest" /> -->
-  <ul class="list bg-base-100 rounded-box shadow-md">
+  <ul class="list bg-base-100 rounded-box shadow-md white-back flex-column gap-2" v-else >
   <AnimalListCommponent 
     v-for="animal in animals" 
     :key="animal.animalId"

@@ -1,5 +1,6 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import "tailwindcss";
+
 @plugin "daisyui";
 
 *{
@@ -12,7 +13,7 @@
     color: black;
 }
 div,  li, ul{
-    background-color: #FBFBFB;
+    /* background-color: #FBFBFB; */
     box-shadow: none;
 
 }
@@ -32,4 +33,18 @@ footer{
 }
 .blue-back{
     background-color: #E5EEFF;
+}
+.white-back{
+    background-color: #FBFBFB;
+}
+.gray-back{
+    background-color: #F5F5F5;
+}
+.page-user{
+    min-height: calc(100vh - 5rem);
+    display: flex;
+    flex-direction: column;
+}
+.page-content{
+    flex: 1;
 }

@@ -15,7 +15,7 @@ const toggleDetails = () => {
 </script>
 
 <template>
-  <div class="card bg-base-100 shadow-md border border-base-300">
+  <div class="card shadow-md border border-base-300">
     <div class="card-body">
       <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>

@@ -4,8 +4,10 @@ import AnimalPostForm from './AnimalPostForm.vue';
 // import UploadPhoto from './UploadPhoto.vue';
 import {Animal} from '@/types/index.ts'
 import { useAnimals } from '@/composables/useAnimals'
+import { Icon } from '@iconify/vue';
 
 const {postAnimal} = useAnimals()
+const photos = ref<{ base64Data: string; imageExtension: string; main: boolean }[]>([])
 
 const props = withDefaults(defineProps<{
   animal?: Animal
@@ -15,19 +17,36 @@ const props = withDefaults(defineProps<{
     species: '',
     name: '',
     age: 0,
-    sex: '',
+    sex: 'M',
     description: '',
     photos: [],
     card: null
   })
 })
 const _emit = defineEmits<{
-  addAnimalModal: [modalOpen: boolean]
+  addAnimalModal: [modalOpen: boolean, addCard: boolean, animal?: Animal]
 }>()
 
 
 // const showPostForm = ref(false)
 const formData = ref<Animal>(props.animal)
+
+function validateForm(){
+  if(formData.value.name == '' || formData.value.species == ''){
+    return false
+  }
+  if(photos.value.length > 0){
+    if(!photos.value.find(photo => photo.main)){
+    return false
+  }
+  }
+  if(formData.value.card){
+    if(formData.value.card.status == ''){
+      return false
+    }
+  }
+  return true
+}
 
 function addAnimalFunction(){
   const postAnimalData = {
@@ -37,16 +56,37 @@ function addAnimalFunction(){
   age: formData.value.age,
   sex: formData.value.sex,
   description: formData.value.description,
-  photos: []
+  photos: [],
+  card: formData.value.card
 
   } as Animal
   postAnimal(postAnimalData)
+  // console.log(postAnimalData)
+}
+const handleFiles = (event: Event) => {
+  const files = (event.target as HTMLInputElement).files
+  if (!files) return
+
+  Array.from(files).forEach((file) => {
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      photos.value.push({
+        base64Data: reader.result as string,
+        imageExtension: file.type.split('/')[1], // np. "png"
+        main: photos.value.length === 0 // pierwszy domyślnie główny
+      })
+    }
+
+    reader.readAsDataURL(file)
+  })
 }
 
 function toggleCardStatus(){
   if(formData.value.card){
     formData.value.card = null
   }else{
+    // console.log('wykonuje sie')
     formData.value.card = { id: 0, status: '', date: 0, animalId: formData.value.animalId}
   }
 }
@@ -54,6 +94,15 @@ function addCardInfo(status: string){
   if(formData.value.card){
     formData.value.card.status = status
   }
+}
+function deletePhoto(index: number){
+  photos.value.splice(index, 1)
+}
+function toggleMainPhoto(index: number){
+  photos.value = photos.value.map((photo, i) => ({
+    ...photo,
+    main: i === index ? !photo.main : false
+  }))
 }
 
 function closeModal(){
@@ -67,7 +116,7 @@ function closeModal(){
       photos: [],
       card: null
     }
-  _emit('addAnimalModal', false)
+  _emit('addAnimalModal', false, false)
 }
 
 watch(() => props.animal,(newVal: Animal) =>{
@@ -77,7 +126,7 @@ watch(() => props.animal,(newVal: Animal) =>{
 </script>
 <template>
     <dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
-  <div class="modal-box">
+  <div class="modal-box white-back ">
     <div class="flex justify-between" >
         <h3 class="font-bold text-lg">Dodaj zwierzę do bazy</h3>
         <button class="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
@@ -112,11 +161,11 @@ watch(() => props.animal,(newVal: Animal) =>{
     <fieldset class="fieldset">
         <legend class="fieldset-legend">Płeć</legend>
         <label class="label mt-5">
-            <input type="radio" name="sex" v-model="formData.sex" value="M" class="radio" defaultChecked />
+            <input type="radio" name="sex" id="m" v-model="formData.sex" value="M" class="radio" defaultChecked />
             Samiec
         </label>
         <label class="label mt-5">
-            <input type="radio" name="sex" v-model="formData.sex" value="F" class="radio" />
+            <input type="radio" name="sex" id="f" v-model="formData.sex" value="F" class="radio" />
             Samica
         </label>
     </fieldset>
@@ -124,15 +173,40 @@ watch(() => props.animal,(newVal: Animal) =>{
         <legend class="fieldset-legend">Opis</legend>
         <textarea class="textarea" placeholder="Opis zwierzaka..." v-model="formData.description"></textarea>
         </fieldset>
+    <fieldset class="fieldset" >
+       <legend class="fieldset-legend">Zdjęcia</legend>
+      <input type="file" class="file-input" multiple @change="handleFiles" />
+      <div class="flex gap-2" >
+        <div v-for="(photo, index) in photos" :key="index" >
+          <img :src="photo.base64Data" class="w-20 h-20 rounded-sm" :class="photo.main ? 'border-2' : null" />
+
+         <div class="flex gap-1 justify-center" >
+            <button
+              v-if="!photo.main"
+              @click="toggleMainPhoto(index)">
+              <Icon icon="mdi-light:heart" width="20" height="20" class="hover:opacity-50" />
+            </button>
+            <button
+              v-else
+              @click="toggleMainPhoto(index)">
+              <Icon icon="mdi-light:heart-off" width="20" height="20" class="hover:opacity-50" />
+            </button>
+            <button @click="deletePhoto(index)">
+              <Icon icon="mdi-light:delete" width="20" height="20" class="hover:opacity-50" />
+            </button>
+         </div>
+        </div>
+      </div>
+    </fieldset>
 
 <!-- <UploadPhoto/> -->
 
 <!-- otwiera form ogłoszenia -->
     <label class="label mt-5" >
-    <input type="checkbox" :checked="props.animal.card != null" class="checkbox" @click="toggleCardStatus" />
+    <input type="checkbox" :checked="formData.card != null" class="checkbox" @click="toggleCardStatus" />
     Dodaj ogłoszenie
   </label>
-  <AnimalPostForm v-if="props.animal.card != null" @add-animal-post="addCardInfo" />
+  <AnimalPostForm v-if="formData.card != null" @add-animal-post="addCardInfo" />
   <!-- zamkniecie -->
     <div class="modal-action">
       <form method="dialog">

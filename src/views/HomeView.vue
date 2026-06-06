@@ -37,7 +37,7 @@ const goToDetails = (id: number) => {
 }
 </script>
 <template>
-  <div class="card bg-base-100 w-full max-w-3xl mx-auto shadow-md">
+  <div class="card bg-base-100 w-full max-w-3xl mx-auto shadow-md white-back page-user">
     <div class="card-body">
       <h2 class="card-title text-2xl mb-4">Jakiego zwierzaka szukasz?</h2>
       <div class="flex gap-2 mb-4">

@@ -21,8 +21,8 @@ function searchAnimal (){
 
 </script>
 <template>
-    <div >
-  <div class="flex gap-5" >
+    <div class="white-back" >
+  <div class="flex gap-5 " >
     <h1 class="flex-4 text-2xl" >Zwierzaki w bazie</h1>
     <input v-model="searchBarValue" @input="searchAnimal" type="text"  placeholder="Wyszukaj..." class="input input-bordered flex-4" />
     <button @click="openAddAnimalModal" class="btn btn-primary flex-1" >Dodaj</button>

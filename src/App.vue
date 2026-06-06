@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import Footer from './components/Footer.vue';
+import { useAnimals } from './composables/useAnimals.ts';
+import ErrorMessage from './components/ErrorMessage.vue';
+import { watch } from 'vue'
+
+const { errorMessage } = useAnimals()
+
+watch(errorMessage, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      errorMessage.value = null
+    }, 3000)
+  }
+})
 
 </script>
 
 <template>
+  <ErrorMessage :errorMessage="errorMessage" v-if="errorMessage" />
+
   <!-- <nav>
     <ul class="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box">
       <li>
