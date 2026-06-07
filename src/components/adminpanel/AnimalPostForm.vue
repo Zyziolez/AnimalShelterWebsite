@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import {ref, defineEmits, watch} from 'vue'
+import {ref, defineEmits, watch, onMounted} from 'vue'
 
 const props = defineProps<{
-    emitData?: boolean
+    emitData?: boolean,
+    initialStatus?: string
 }>()
-const statusRef = ref('')
+const statusRef = ref(props.initialStatus || '')
 // const 
+
+onMounted(() => {
+  console.log('initial status:', props.initialStatus)
+})
 
 const _emit = defineEmits<{
     'add-animal-post': [animalStatus: string]
@@ -23,7 +28,7 @@ watch(
 <template>
     <fieldset class="fieldset">
         <legend class="fieldset-legend">Status</legend>
-        <select v-model="statusRef" class="select">
+        <select v-model="statusRef" class="select" @change="_emit('add-animal-post', statusRef)" >
         <option disabled='true' value="">Status</option>
         <option value="Do adopcji">Do adopcji</option>
         <option value="Adoptowany internetowo">Adoptowany internetowo</option>

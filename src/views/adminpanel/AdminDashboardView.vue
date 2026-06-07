@@ -7,14 +7,15 @@ import AnimalListCommponent from '@/components/AnimalListCommponent.vue';
 // import UploadPhoto from '@/components/adminpanel/UploadPhoto.vue';
 import AddAnimalModal from '@/components/adminpanel/AddAnimalModal.vue';
 import {Animal} from '@/types/index.ts'
+import { esmExternalRequirePlugin } from 'vite';
 
-const { animalsList, fetchAnimals, deleteAnimalEndpoint, loading } = useAnimals()
+const { animalsList, fetchAnimals, deleteAnimalEndpoint, loading, deleteCardEndpoint } = useAnimals()
 const animals = ref<Animal[]>([])
 
 onMounted(async () => {
   
   await fetchAnimals()
-  // console.log(animalsList.value)
+
   animals.value = [...animalsList.value]
 })
 const selectedAnimal = ref<Animal | undefined>(undefined)
@@ -26,20 +27,34 @@ function openAddAnimalModal(show: boolean, addCard: boolean, animal?: Animal){
       animal.card = {
         id: 0,
         date: Date.now(),
-        status: 'active',
+        status: '',
         animalId: animal.animalId!,
       }
     }
     selectedAnimal.value = animal
   }
   if(show){
-    console.log('otwieram modal')
+    modal.showModal()
+  }else{
+    modal.close()
+    selectedAnimal.value = undefined
   }
-  show ? modal.showModal() : modal.close()
+
 }
 
-function deleteAnimal(animalId: number){
-  deleteAnimalEndpoint(animalId)
+async function deleteAnimal(animalId: number){
+  await deleteAnimalEndpoint(animalId)
+  animals.value = animals.value.filter(animal => animal.animalId !== animalId)
+}
+async function deleteCard(cardId: number){
+  await deleteCardEndpoint(cardId)
+
+  animals.value = animals.value.map(animal => {
+    if(animal.card && animal.card.id === cardId){
+      return {...animal, card: null}
+    }
+    return animal
+  })
 }
 
 function serachAnimalByName(searchValue: string, sex: string, species: string){
@@ -51,9 +66,32 @@ function serachAnimalByName(searchValue: string, sex: string, species: string){
   })
 }
 
-function editAnimal(animal: Animal){
-  selectedAnimal.value = animal
-  // openAddAnimalModal(true, animal.card != null, animal)
+// function editAnimal(animal: Animal){
+//   selectedAnimal.value = animal
+//   // openAddAnimalModal(true, animal.card != null, animal)
+// }
+function addAnimalToList(newAnimal: Animal){
+  
+ if(newAnimal){
+   const index = animals.value.findIndex(a => a.animalId === newAnimal.animalId)
+  
+  if(index !== -1){
+    animals.value[index] = {
+      ...animals.value[index],  // zachowaj zdjęcia
+      species: newAnimal.species,
+      name: newAnimal.name,
+      age: newAnimal.age,
+      sex: newAnimal.sex,
+      description: newAnimal.description,
+      card: newAnimal.card
+    }
+  } else {
+    console.log(newAnimal)
+    animals.value.push(newAnimal)
+  }
+ }else{
+  window.location.reload()
+ }
 }
 // const animalTest = ref<Animal>({ name: 'Dominik', description: 'Przyjacielski pies', sex: 'M', age: 5, species: 'Pies' })
 </script>
@@ -79,19 +117,11 @@ function editAnimal(animal: Animal){
     :animal="animal" 
     @add-animal-modal="openAddAnimalModal" 
     @delete-animal="deleteAnimal"
+    @delete-card="deleteCard"
   />
 </ul>
 </ul>
-  
-<!-- <div class="w-full flex justify-center mt-5" >
-    <div class="join">
-    <button @click="changePage(-1)" class="join-item btn">«</button>
-    <button class="join-item btn">{{ pageNumber }}</button>
-    <button @click="changePage(1)" class="join-item btn">»</button>
-  </div>
-</div> -->
-    <!-- <UploadPhoto/> -->
     </div>
     </div>
-    <AddAnimalModal @add-animal-modal="openAddAnimalModal" :animal="selectedAnimal"  />
+    <AddAnimalModal @add-animal-modal="openAddAnimalModal" :animal="selectedAnimal" @add-animal-to-list="addAnimalToList"  />
 </template>

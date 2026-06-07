@@ -1,6 +1,11 @@
 
 <script setup lang="ts">
 
+function logout(){
+    localStorage.removeItem('token')
+    window.location.href = '/login'
+}
+
 </script>
 <template>
         <div class="h-20" >
@@ -30,6 +35,7 @@
         <ul class="menu menu-horizontal">
           <li><RouterLink to="/admin" ><button class="btn btn-ghost" >Dashboard</button></RouterLink></li>
           <li><RouterLink to="/admin/forms"><button class="btn btn-ghost">Formularze</button></RouterLink></li>
+        <li><button class="btn btn-ghost" @click="logout">Wyloguj</button></li>
           
         </ul>
       </div>
@@ -43,6 +49,8 @@
     <ul class="menu menu-horizontal">
           <li><button class="btn btn-ghost">Panel</button></li>
           <li><button class="btn btn-ghost">Formularze</button></li>
+          <li><button class="btn btn-ghost" @click="logout">Wyloguj</button></li>
+          
           
         </ul>
   </div>

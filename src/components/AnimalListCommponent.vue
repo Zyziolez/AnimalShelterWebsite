@@ -3,25 +3,24 @@
 import { onMounted } from 'vue'
 import { Icon } from '@iconify/vue';
 import {Animal} from '@/types/index.ts'
+import { useAnimals } from '@/composables/useAnimals'
+
 
 const props = defineProps<{
   animal: Animal
 }>();
 const _emit = defineEmits<{
   addAnimalModal: [modalOpen: boolean, addCard: boolean, animal?: Animal],
-  deleteAnimal: [animalId: number]
+  deleteAnimal: [animalId: number],
+  deleteCard: [cardId: number]
 }>()
-
-onMounted(() => {
-  console.log(props.animal)
-})
 
 function edit(){
   // console.log('gowno')
   _emit('addAnimalModal', true, false, props.animal)
 }
 function deleteAnimal(){
-  console.log('kliknieto mnie')
+  // console.log('kliknieto mnie')
   _emit('deleteAnimal', props.animal.animalId!)
 }
 
@@ -29,14 +28,16 @@ function addCard(){
   _emit('addAnimalModal', true, true, props.animal)
 }
 function deleteCard(){
-  console.log('usuwam karte')
+  if(props.animal.card){
+    _emit('deleteCard', props.animal.card.id)
+  }
 }
 
 </script>
 <template>
     <li class="list-row gray-back">
     <div>
-      <img
+<img
   v-if="props.animal.photos?.[0]?.imageData"
   class="size-10 rounded-box"
   :src="`data:image/${props.animal.photos[0].imageExtension};base64,${props.animal.photos[0].imageData}`"/>

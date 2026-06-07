@@ -93,9 +93,12 @@ export function useAnimals() {
   }
 
   const createCard = async (card: AnimalCard) => {
+    console.log(JSON.stringify(card))
   return fetch('https://localhost:5001/api/Cards', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+     },
     body: JSON.stringify(card)
   })
 }
@@ -108,40 +111,53 @@ export function useAnimals() {
   age: animalData.age,
   sex: animalData.sex,
   description: animalData.description,
-  photo: []
+  photo: animalData.photos
 }))
     // loading.value = true
     try {
       const response = await fetch('https://localhost:5001/api/Animals', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-  animalId: 0,
-  species: animalData.species,
-  name: animalData.name,
-  age: animalData.age,
-  sex: animalData.sex,
-  description: animalData.description,
-  photo: null
-})
+        animalId: 0,
+        species: animalData.species,
+        name: animalData.name,
+        age: animalData.age,
+        sex: animalData.sex,
+        description: animalData.description,
+        photo: animalData.photos
       })
-      
-       const createdAnimal = await response.json() as Animal
+      })
+     
+     if (!response.ok) {
+    const error = await response.text()
+    // console.error('Błąd serwera:', error)
+    throw new Error('Wystąpił błąd')
+}
 
-      if (animalData.card) {
-      await createCard({
+const createdAnimal = await response.json()
+
+
+
+ if (animalData.card) {
+      createdAnimal.card = await createCard({
         id: 0,
         date: animalData.card.date,
         status: animalData.card.status,
         animalId: createdAnimal.animalId
       })
     }
-      if (!response.ok) {
-        throw new Error('Wystąpił błąd')
-      }
+
+    const mappedAnimal = {
+    ...createdAnimal,
+    photos: createdAnimal.photo 
+} as Animal
+  return mappedAnimal
   }
+  
   catch(err){
      if (err instanceof Error) {
         errorMessage.value = err.message
@@ -155,7 +171,10 @@ const deleteAnimalEndpoint = async (animalId: number) => {
   // loading.value = true
   try {
     const response = await fetch(`https://localhost:5001/api/Animals/${animalId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
     })
     if (!response.ok) {
       throw new Error('Wystąpił błąd')
@@ -177,7 +196,8 @@ const postCard = async (cardData: AnimalCard) => {
     const response = await fetch('https://localhost:5001/api/Cards', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify(cardData)
     })
@@ -204,12 +224,16 @@ const deleteCardEndpoint = async (cardId: number) => {
   loading.value = true
   try {
     const response = await fetch(`https://localhost:5001/api/Cards/${cardId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
     })
 
     if (!response.ok) {
       throw new Error('Wystąpił błąd')
     }
+    return true
   }
   catch (err) {
     if (err instanceof Error) {
@@ -217,11 +241,101 @@ const deleteCardEndpoint = async (cardId: number) => {
       } else {
         errorMessage.value = 'Nieznany błąd'
       }
+      return false
   }
   finally {
     loading.value = false
   }
 }
+
+const updateAnimal = async (animal: Animal) => {
+    const response = await fetch(`https://localhost:5001/api/Animals/${animal.animalId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+            animalId: animal.animalId,
+            species: animal.species,
+            name: animal.name,
+            age: animal.age,
+            sex: animal.sex,
+            description: animal.description,
+            photo: []
+        })
+    })
+    
+
+    if (!response.ok) {
+        const error = await response.text()
+        throw new Error(error)
+    }
+}
+
+const updateCard = async (card: AnimalCard) => {
+  // console.log(JSON.stringify({
+  //           id: card.id,
+  //           date: card.date,
+  //           status: card.status,
+  //           animalId: card.animalId
+  //       }))
+    const response = await fetch(`https://localhost:5001/api/Cards/${card.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'id': card.id.toString()
+        },
+        body: JSON.stringify({
+            id: card.id,
+            date: card.date,
+            status: card.status,
+            animalId: card.animalId
+        })
+    })
+
+    if (!response.ok) {
+        const error = await response.text()
+        throw new Error(error)
+    }
+}
+
+const updateAnimalWithCard = async (animalData: Animal, newCard: boolean) => {
+  // console.log('Updating animal with card:', JSON.stringify(animalData))
+  const animalDataCopy = { ...animalData }
+  if (animalDataCopy.card) {
+  animalDataCopy.card.animalId = animalDataCopy.animalId!
+  }
+  // console.log('Prepared animal data for update:', JSON.stringify(animalDataCopy))
+    try {
+        await updateAnimal(animalData)
+        if (animalData.card && !newCard) {
+            await updateCard(animalData.card)
+        }else if (animalData.card && newCard) {
+          const postCardData = {
+            id: 0,
+            date: Date.now(),
+            status: animalData.card.status,
+            animalId: animalData.animalId!
+          }
+            await postCard(postCardData)
+        }else if(!animalData.card && !newCard){
+          await deleteCardEndpoint(animalDataCopy.card!.id)
+        }
+        return animalData
+    } catch (err) {
+        if (err instanceof Error)
+            errorMessage.value = err.message
+        else
+            errorMessage.value = 'Nieznany błąd'
+
+        return animalData
+    }
+    
+}
+
+
 
 return {
   animals,
@@ -237,6 +351,7 @@ return {
   postAnimal,
   deleteAnimalEndpoint,
   postCard,
-  deleteCardEndpoint
+  deleteCardEndpoint,
+  updateAnimalWithCard,
 }
 }
