@@ -1,152 +1,251 @@
-
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useForm, useField } from 'vee-validate'
+import { z } from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import { Icon } from '@iconify/vue'
+import { useAnimals } from '@/composables/useAnimals.ts' 
+import { useForms } from '@/composables/useForms.ts'
 
-  //ogólnie to ma pobierać zwierzeta z bazy 
-//słowniki, potem można ewentualnie zmienić
-const speciesMap: Record<string, string> = { 'P': 'Pies', 'K': 'Kot'}
-const sexMap: Record<string, string> = { 'M': 'Samiec', 'F' : 'Samica' }
+// domyślne obrazki
+import dogImage from './../assets/images/dog.png'
+import catImage from './../assets/images/cat.png'
+
+const router = useRouter()
 const route = useRoute()
+const { singleAnimal, loading, fetchAnimalById } = useAnimals()
+const { sendContactForm } = useForms()
+
+// pobranie ID zwierzaka z adresu URL 
 const animalId = route.params.animalId as string
 
-const animalData = ref<unknown>(null)
-const errorMsg = ref('')
-const formStatus = ref('')
+const isModalOpen = ref(false)
+const formSuccessStatus = ref('')
 
-const formData = ref({
-    animalId: parseInt(animalId),
-    firstName: '',
-    lastName: '',
-    mail: '',
-    phoneNumber: '',
-    content: ''
-})
-
-onMounted(() => {
-  fetch(`https://localhost:5001/api/Animals/${animalId}`)
-    .then((res) => {
-      if (!res.ok) throw new Error('Błąd pobierania zwierzaka z API')
-      return res.json()
-    })
-    .then((data) => {
-      animalData.value = data
-    })
-    .catch((err) => {
-      errorMsg.value = err.message
-      console.error(err)
-    })
-})
-
-const submitForm = async () => {
-  try {
-    const response = await fetch('https://localhost:5001/api/Forms', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData.value)
-    })
-
-    if (!response.ok) throw new Error('Serwer odrzucił formularz')
-
-    formStatus.value = "Sukces: Formularz został zapisany v bazie danych!"
-    
-    // Czyszczenie po wysłaniu
-    formData.value.firstName = ''
-    formData.value.lastName = ''
-    formData.value.mail = ''
-    formData.value.phoneNumber = ''
-    formData.value.content = ''
-  } catch (err: unknown) {
-    const error = err as Error;
-    formStatus.value = `Błąd: ${error.message || 'Nie udało się połączyć z API'}`
+// pobranie szczegółów zwierzaka
+onMounted(async () => {
+  if (animalId) {
+    await fetchAnimalById(animalId)
   }
-}
+})
+
+// sprawdza czy ma zdjecie (base64) a jak nie to podstawia
+const imageSrc = computed(() => {
+  if (singleAnimal.value?.photos?.[0]?.imageData) {
+    return `data:image/${singleAnimal.value.photos[0].imageExtension};base64,${singleAnimal.value.photos[0].imageData}`
+  }
+  return singleAnimal.value?.species === 'Pies' ? dogImage : catImage
+})
+
+// formatowanie płci i wieku na czytelny tekst
+const formattedSex = computed(() => {
+  if (!singleAnimal.value) return ''
+  return singleAnimal.value.sex === 'M' ? 'Samiec' : 'Samica'
+})
+
+const formattedAge = computed(() => {
+  if (!singleAnimal.value) return ''
+  const age = singleAnimal.value.age
+  if (age === 1) return '1 rok'
+  if (age > 1 && age < 5) return `${age} lata`
+  return `${age} lat`
+})
+
+// walidacja VEE-VALIDATE + ZOD
+const validationSchema = toTypedSchema(
+  z.object({
+    firstName: z.string().min(1, 'Pole nie może być puste'),
+    lastName: z.string().min(1, 'Pole nie może być puste'),
+    mail: z.string().email('Niepoprawny format adresu e-mail'),
+    phoneNumber: z.string().regex(/^\+?[0-9]{9,15}$/, 'Niepoprawny numer telefonu (min. 9 cyfr)'),
+    content: z.string().min(1, 'Treść zgłoszenia nie może być pusta')
+  })
+)
+
+const { handleSubmit, resetForm } = useForm({ validationSchema })
+
+const { value: firstName, errorMessage: firstNameError } = useField<string>('firstName')
+const { value: lastName, errorMessage: lastNameError } = useField<string>('lastName')
+const { value: mail, errorMessage: mailError } = useField<string>('mail')
+const { value: phoneNumber, errorMessage: phoneNumberError } = useField<string>('phoneNumber')
+const { value: content, errorMessage: contentError } = useField<string>('content')
+
+// wysyłanie formularza (POST)
+const submitForm = handleSubmit(async (values) => {
+  try {
+    const payload = {
+      id: 0, 
+      date: "", 
+      firstName: values.firstName,     
+      lastName: values.lastName,       
+      mail: values.mail,               
+      phoneNumber: values.phoneNumber, 
+      content: values.content,         
+      animalId: Number(animalId) 
+    }
+
+    const result = await sendContactForm(payload)
+
+    if (result && result.code === 200) {
+      formSuccessStatus.value = "Formularz został pomyślnie wysłany!"
+      resetForm() 
+      isModalOpen.value = false 
+    } else {
+      throw new Error(result?.message || 'Wystąpił błąd po stronie serwera.')
+    }
+
+  } catch (err: any) {
+    console.error("Błąd podczas wysyłania:", err)
+    alert(`Nie udało się wysłać zgłoszenia. Szczegóły: ${err.message}`)
+  }
+})
 </script>
 
 <template>
-  <div style="padding: 20px; font-family: sans-serif;" class="white-back page-user">
-    
-    <div v-if="errorMsg" style="color: red; font-weight: bold;">
-      {{ errorMsg }}
-    </div>
-
-    <div v-if="animalData">
+  <div class="white-back page-user p-8">
+    <div class="page-content">
       
-      <section>
-        <h2>Informacje o zwierzaku: {{ animalData.name }}</h2>
-        <ul>
-          <li><strong>ID w bazie:</strong> {{ animalData.animalId }}</li>
-          <li><strong>Imię:</strong> {{ animalData.name }}</li>
-          <li><strong>Gatunek:</strong> {{ speciesMap[animalData.species] || animalData.species }}</li>
-          <li><strong>Wiek:</strong> {{ animalData.age }} lat/a</li>       
-          <li><strong>Płeć:</strong> {{ sexMap[animalData.sex] || animalData.sex }}</li>
-          <li><strong>Opis:</strong> {{ animalData.description }}</li>
-        </ul>
-      </section>
+      <div v-if="loading" class="flex justify-center items-center py-12">
+        <span class="loading loading-spinner loading-lg"></span>
+        <span class="ml-3 font-semibold">Ładowanie danych zwierzaka...</span>
+      </div>
 
-      <hr />
+      <div v-else-if="singleAnimal">
+        
+        <div 
+          class="p-6 rounded-box flex flex-col md:flex-row gap-8 mb-8 border border-base-300"
+          :class="singleAnimal.sex == 'M' ? 'blue-male-back' : 'pink-female-back'"
+        >
+          <img :src="imageSrc" alt="Profil zwierzaka" class="w-64 h-64 object-cover rounded-box shadow-md" />
 
-      <section>
-        <h3>Galeria zdjęć</h3>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-          <div v-for="photo in animalData.photo" :key="photo.id" style="border: 1px solid #ccc; padding: 5px;">
-            <img :src="photo.apiLink" alt="Zdjecie" style="width: 150px; height: 150px; object-fit: cover;" />
-            <div style="font-size: 11px; text-align: center;">
-              {{ photo.main ? '★ Główne' : `ID: ${photo.id}` }}
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <h2 class="text-3xl font-bold flex items-center gap-2 mb-4">
+                {{ singleAnimal.name }}
+                <Icon v-if="singleAnimal.sex == 'M'" icon="mdi:gender-male" class="text-blue-500" />
+                <Icon v-else icon="mdi:gender-female" class="text-pink-500" />
+              </h2>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
+                <div><strong>ID w schronisku:</strong> {{ singleAnimal.animalId }}</div>
+                <div><strong>Gatunek:</strong> {{ singleAnimal.species }}</div>
+                <div><strong>Wiek:</strong> {{ formattedAge }}</div>
+                <div><strong>Płeć:</strong> {{ formattedSex }}</div>
+                <div v-if="singleAnimal.card" class="sm:col-span-2">
+                  <span class="badge badge-neutral p-3">Status karty: {{ singleAnimal.card.status }}</span>
+                </div>
+              </div>
+
+              <div class="divider my-2"></div>
+              <p class="text-base font-medium leading-relaxed mt-2">
+                <span class="font-bold block mb-1">Opis:</span>
+                {{ singleAnimal.description }}
+              </p>
+            </div>
+
+            <div class="mt-6">
+              <button @click="isModalOpen = true" class="btn btn-accent bg-[#22c55e] text-white font-bold px-6 border-none">
+                <Icon icon="mdi-light:note-plus" class="text-white text-lg mr-1" /> 
+                Kontakt w sprawie zwierzaka
+              </button>
             </div>
           </div>
         </div>
-      </section>
 
-      <hr />
-
-      <section>
-        <h3>Formularz kontaktowy w sprawie zwierzaka</h3>
-        
-        <form @submit.prevent="submitForm" style="display: flex; flex-direction: column; gap: 10px; max-w: 400px;">
-          
-          <div>
-            <label style="display: block;">Imię:</label>
-            <input v-model="formData.firstName" type="text" style="width: 100%; padding: 5px;" required />
+        <div v-if="singleAnimal.photos && singleAnimal.photos.length > 0" class="mt-8">
+          <h3 class="text-xl font-bold mb-4">Wszystkie zdjęcia ({{ singleAnimal.photos.length }})</h3>
+          <div class="flex flex-wrap gap-4">
+            <div v-for="(photo, index) in singleAnimal.photos" :key="photo.id || index" class="border border-base-300 p-2 rounded-box bg-[#FBFBFB]">
+              <img 
+                :src="`data:image/${photo.imageExtension};base64,${photo.imageData}`" 
+                alt="Zdjęcie z galerii" 
+                class="w-40 h-40 object-cover rounded-box" 
+              />
+              <div class="text-xs text-center mt-2 font-semibold opacity-60">
+                {{ index === 0 ? '★ Zdjęcie główne' : `Zdjęcie #${index + 1}` }}
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div>
-            <label style="display: block;">Nazwisko:</label>
-            <input v-model="formData.lastName" type="text" style="width: 100%; padding: 5px;" required />
+        <div v-if="formSuccessStatus" class="alert alert-success mt-6 bg-[#22c55e] border-none text-white font-semibold shadow">
+          <Icon icon="mdi:check-circle" class="text-white text-xl" />
+          <span>{{ formSuccessStatus }}</span>
+        </div>
+
+        <Teleport to="body">
+          <div v-if="isModalOpen" class="modal-backdrop">
+            <div class="modal-content border border-black bg-[#FBFBFB]">
+              
+              <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold">Formularz kontaktowy: {{ singleAnimal.name }}</h3>
+                <button @click="isModalOpen = false" class="btn btn-sm btn-circle btn-ghost text-xl">&times;</button>
+              </div>
+
+              <form @submit="submitForm" class="flex flex-col gap-4">
+                
+                <div class="form-control">
+                  <label class="label font-bold text-sm">Imię:</label>
+                  <input v-model="firstName" type="text" class="input input-bordered w-full" />
+                  <span class="text-error text-xs mt-1 font-semibold">
+                    {{ firstNameError?.includes('undefined') ? 'Pole nie może być puste' : firstNameError }}
+                  </span>
+                </div>
+
+                <div class="form-control">
+                  <label class="label font-bold text-sm">Nazwisko:</label>
+                  <input v-model="lastName" type="text" class="input input-bordered w-full" />
+                  <span class="text-error text-xs mt-1 font-semibold">
+                    {{ lastNameError?.includes('undefined') ? 'Pole nie może być puste' : lastNameError }}
+                  </span>
+                </div>
+
+                <div class="form-control">
+                  <label class="label font-bold text-sm">Adres e-mail:</label>
+                  <input v-model="mail" type="text" class="input input-bordered w-full" />
+                  <span class="text-error text-xs mt-1 font-semibold">
+                    {{ mailError?.includes('undefined') ? 'Pole nie może być puste' : mailError }}
+                  </span>
+                </div>
+
+                <div class="form-control">
+                  <label class="label font-bold text-sm">Numer telefonu:</label>
+                  <input v-model="phoneNumber" type="text" class="input input-bordered w-full" />
+                  <span class="text-error text-xs mt-1 font-semibold">
+                    {{ phoneNumberError?.includes('undefined') ? 'Pole nie może być puste' : phoneNumberError }}
+                  </span>
+                </div>
+
+                <div class="form-control">
+                  <label class="label font-bold text-sm">Treść zgłoszenia (Uzasadnienie):</label>
+                  <textarea v-model="content" rows="4" class="textarea textarea-bordered w-full"></textarea>
+                  <span class="text-error text-xs mt-1 font-semibold">
+                    {{ contentError?.includes('undefined') ? 'Treść zgłoszenia nie może być pusta' : contentError }}
+                  </span>
+                </div>
+
+                <div class="flex gap-3 justify-end mt-4">
+                  <button type="button" @click="isModalOpen = false" class="btn btn-ghost font-bold">
+                    Anuluj
+                  </button>
+                  <button type="submit" class="btn bg-[#22c55e] text-white font-bold border-none px-6">
+                    Wyślij
+                  </button>
+                </div>
+
+              </form>
+
+            </div>
           </div>
+        </Teleport>
 
-          <div>
-            <label style="display: block;">Adres e-mail:</label>
-            <input v-model="formData.mail" type="email" style="width: 100%; padding: 5px;" required />
-          </div>
+      </div>
 
-          <div>
-            <label style="display: block;">Numer telefonu:</label>
-            <input v-model="formData.phoneNumber" type="tel" style="width: 100%; padding: 5px;" required />
-          </div>
-
-          <div>
-            <label style="display: block;">Treść zgłoszenia (Content):</label>
-            <textarea v-model="formData.content" rows="4" style="width: 100%; padding: 5px;" required></textarea>
-          </div>
-
-          <button type="submit" style="padding: 10px; cursor: pointer; background: #22c55e; color: white; border: none;">
-            Zapisz formularz w bazie (POST)
-          </button>
-        </form>
-
-        <p v-if="formStatus" style="margin-top: 15px; padding: 10px; background: #f3f4f6; font-weight: bold;">
-          {{ formStatus }}
-        </p>
-      </section>
+      <div v-else class="text-center py-12 font-semibold opacity-60">
+        Nie znaleziono wybranego zwierzęcia.
+      </div>
 
     </div>
-
-    <div v-else-if="!errorMsg">
-      Trwa komunikacja z backendem...
-    </div>
-
   </div>
 </template>
