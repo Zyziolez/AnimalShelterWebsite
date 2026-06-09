@@ -4,6 +4,7 @@ import Footer from './components/Footer.vue';
 import { useAnimals } from './composables/useAnimals.ts';
 import ErrorMessage from './components/ErrorMessage.vue';
 import { watch } from 'vue'
+import { router, isLoading } from './router'
 
 const { errorMessage } = useAnimals()
 
@@ -18,18 +19,17 @@ watch(errorMessage, (newValue) => {
 </script>
 
 <template>
-  <ErrorMessage :errorMessage="errorMessage" v-if="errorMessage" />
+   <ErrorMessage :errorMessage="errorMessage" v-if="errorMessage" />
 
-  <!-- <nav>
-    <ul class="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box">
-      <li>
-        <a><RouterLink to="/">Strona Główna</RouterLink></a>
-      </li>
-      <li>
-        <a><RouterLink to="/animal/1">Test Zwierzaka</RouterLink></a>
-      </li>
-    </ul>
-  </nav> -->
-  <RouterView />
-  <Footer/>
+    <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-4">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <p class="text-gray-600 animate-pulse">Ładowanie...</p>
+    </div>
+  </div>
+
+  <template v-else >
+    <RouterView />
+    <Footer/>
+  </template>
 </template>

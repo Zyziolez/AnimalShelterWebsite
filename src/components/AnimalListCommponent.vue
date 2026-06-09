@@ -101,12 +101,12 @@ function deleteCard(){
 }
 
 .blue-male-back {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdef5 100%);
-  border-left: 4px solid #1976d2;
+  background: #e3f2fd;
+  border-left: 4px solid #5a9de0;
 }
 
 .pink-female-back {
-  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
-  border-left: 4px solid #c2185b;
+  background: #fce4ec;
+  border-left: 4px solid #d7578b;
 }
 </style>

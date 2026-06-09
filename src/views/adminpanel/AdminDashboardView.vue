@@ -76,7 +76,7 @@ function addAnimalToList(newAnimal: Animal){
       card: newAnimal.card
     }
   } else {
-    console.log(newAnimal)
+    // console.log(newAnimal)
     animals.value.push(newAnimal)
   }
  }
@@ -122,6 +122,7 @@ function addAnimalToList(newAnimal: Animal){
       @add-animal-modal="openAddAnimalModal" 
       :animal="selectedAnimal" 
       @add-animal-to-list="addAnimalToList"  
+      
     />
   </div>
 </template>

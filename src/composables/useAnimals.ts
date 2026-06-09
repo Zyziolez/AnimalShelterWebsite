@@ -111,6 +111,15 @@ export function useAnimals() {
 }
 
   const postAnimal = async (animalData: Animal) => {
+    //zdjecie ktore ma byc main musi miec index 0
+     if (animalData.photos && animalData.photos.length > 0) {
+        const mainPhotoIndex = animalData.photos.findIndex(p => p.main === true)
+        if (mainPhotoIndex !== -1 && mainPhotoIndex !== 0) {
+            const mainPhoto = animalData.photos[mainPhotoIndex]
+            animalData.photos.splice(mainPhotoIndex, 1)
+            animalData.photos.unshift(mainPhoto)
+        }
+    }
 
     loading.value = true
     try {
@@ -206,8 +215,8 @@ const deleteAnimalEndpoint = async (animalId: number, hasPhotos: boolean) => {
 }
 
 const postCard = async (cardData: AnimalCard) => {
-  loading.value = true
-  console.log(JSON.stringify(cardData))
+  // loading.value = true
+  // console.log(JSON.stringify(cardData))
   try {
     const response = await fetch('https://localhost:5001/api/Cards', {
       method: 'POST',
@@ -231,9 +240,9 @@ const postCard = async (cardData: AnimalCard) => {
         errorMessage.value = 'Nieznany błąd'
       }
   }
-  finally {
-    loading.value = false
-  }
+  // finally {
+  //   loading.value = false
+  // }
 }
 
 const deleteCardEndpoint = async (cardId: number) => {

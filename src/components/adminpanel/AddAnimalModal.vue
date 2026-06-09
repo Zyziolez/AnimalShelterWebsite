@@ -8,11 +8,13 @@ import { z } from 'zod'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useI18n } from 'vue-i18n'
+import vCapitalize from '@/directives/capitalize' 
 
 const {postAnimal, updateAnimalWithCard} = useAnimals()
 const photos = ref<{ base64Data: string; imageExtension: string; main: boolean }[]>([])
 const { t } = useI18n()
 const fileInput = ref<HTMLInputElement | null>(null)
+const loading = ref<boolean>(false) 
 
 const animalSchema = z.object({
   name: z.string().min(1, t('inputsAndErrors.errNameRequired')),
@@ -68,7 +70,8 @@ const onSubmit = handleSubmit(async (values) => {
     return
   }
   cardError.value = null
-
+  loading.value=true
+  // console.log(photos.value)
   const animalData = {
     ...values,
     photos: photos.value,
@@ -82,6 +85,7 @@ const onSubmit = handleSubmit(async (values) => {
     const newAnimal = await postAnimal(animalData)
     _emit('addAnimalToList', newAnimal)
   }
+  loading.value=false
   closeModal()
 })
 
@@ -121,13 +125,24 @@ function addCardInfo(status: string) {
 
 function deletePhoto(index: number) {
   photos.value.splice(index, 1)
+
+  photos.value = [...photos.value]
+  
+  if (photos.value.length > 0 && !photos.value.some(p => p.main)) {
+    photos.value.length[0].main = true
+    photos.value = [...photos.value]
+  }
 }
 
 function toggleMainPhoto(index: number) {
-  photos.value = photos.value.map((photo, i) => ({
-    ...photo,
-    main: i === index ? !photo.main : false
-  }))
+  console.log(photos.value)
+  const newPhotos = JSON.parse(JSON.stringify(photos.value))
+  newPhotos.forEach((photo: any, i: number) => {
+    photo.main = i === index
+  })
+  
+  photos.value = newPhotos
+  // console.log(photos.value)
 }
 
 function closeModal() {
@@ -143,6 +158,7 @@ function closeModal() {
   card.value = null
   cardError.value = null
   photos.value = []
+  loading.value = false
   _emit('addAnimalModal', false, false)
 }
 
@@ -161,7 +177,17 @@ watch(() => props.animal, (newVal: Animal) => {
 </script>
 
 <template>
-  <dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
+  <template v-if="loading" >
+    <div  class="modal modal-bottom sm:modal-middle" >
+      <div class="modal-box max-w-lg white-back">
+          <div  class="flex justify-center items-center py-16">
+              <span class="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+            </div>
+    </div>
+  </template>
+  <template v-else >
+<dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box max-w-lg white-back">
 
       <div class="flex justify-between items-center mb-6 pb-4 border-b border-base-200 white-back">
@@ -175,8 +201,8 @@ watch(() => props.animal, (newVal: Animal) => {
 
       <div class="grid grid-cols-2 gap-3 mb-3">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend text-xs">{{ t('animal.name') }}</legend>
-          <input type="text" class="input input-sm w-full" :class="{ 'input-error': errors.name }" placeholder="Reksio" v-model="name" />
+          <legend class="fieldset-legend text-xs" >{{ t('animal.name') }}</legend>
+          <input type="text" class="input input-sm w-full" :class="{ 'input-error': errors.name }" v-capitalize  placeholder="Reksio" v-model="name" />
           <span class="text-error text-xs mt-1" v-if="errors.name">{{ errors.name }}</span>
         </fieldset>
 
@@ -230,7 +256,7 @@ watch(() => props.animal, (newVal: Animal) => {
           <span class="text-sm text-base-content/50">{{ t('animal.uploadHint') }}</span>
         </div>
         <div class="flex gap-2 mt-2 flex-wrap" v-if="photos.length > 0">
-          <div v-for="(photo, index) in photos" :key="index" class="relative">
+          <div v-for="(photo, index) in photos" :key="index + '-' + photo.main" class="relative">
             <img :src="photo.base64Data" class="w-16 h-16 rounded-md object-cover" :class="photo.main ? 'ring-2 ring-base-content' : ''" />
             <div class="flex gap-0.5 justify-center mt-1">
               <button v-if="!photo.main" @click="toggleMainPhoto(index)" class="btn btn-xs btn-ghost p-0.5">
@@ -266,4 +292,6 @@ watch(() => props.animal, (newVal: Animal) => {
 
     </div>
   </dialog>
+  </template>
+  
 </template>
