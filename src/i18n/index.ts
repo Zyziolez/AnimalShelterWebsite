@@ -85,7 +85,8 @@ const i18n = createI18n({
         required: 'Pole nie może być puste',
         email: 'Niepoprawny format adresu e-mail',
         phone: 'Niepoprawny numer telefonu (min. 9 cyfr)',
-        messageRequired: 'Treść zgłoszenia nie może być pusta'
+        messageRequired: 'Treść zgłoszenia nie może być pusta',
+        sendError: 'Błąd podczas wysyłania:'
       },
       menu: {
         dashboard: 'Dashboard',
@@ -177,7 +178,8 @@ const i18n = createI18n({
         required: 'This field cannot be empty',
         email: 'Invalid e-mail address format',
         phone: 'Invalid phone number (min. 9 digits)',
-        messageRequired: 'Message content cannot be empty'
+        messageRequired: 'Message content cannot be empty',
+        sendError: 'Error during sending:'
       },
       menu: {
         dashboard: 'Dashboard',
