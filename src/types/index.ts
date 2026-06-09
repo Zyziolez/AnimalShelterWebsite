@@ -10,10 +10,10 @@ export interface Photo {
 
 export interface Animal {
   animalId?: number
-  species: string
+  species: 'Kot' | 'Pies'
   name: string
   age: number
-  sex: string
+  sex: 'M' | 'F'
   description: string
   photos?: Photo[]
   card?: {

@@ -1,27 +1,34 @@
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import {  computed } from 'vue'
 import { Icon } from '@iconify/vue';
 import {Animal} from '@/types/index.ts'
-import { useAnimals } from '@/composables/useAnimals'
-
+import dogImage from './../assets/images/dog.png'
+import catImage from './../assets/images/cat.png'
 
 const props = defineProps<{
   animal: Animal
 }>();
+
+const imageSrc = computed(() => {
+  if (props.animal.photos?.[0]?.imageData) {
+    return `data:image/${props.animal.photos[0].imageExtension};base64,${props.animal.photos[0].imageData}`
+  }
+  return props.animal.species === 'Pies' ? dogImage : catImage
+})
+
 const _emit = defineEmits<{
   addAnimalModal: [modalOpen: boolean, addCard: boolean, animal?: Animal],
-  deleteAnimal: [animalId: number],
+  deleteAnimal: [animalId: number, hasPhotos: boolean],
   deleteCard: [cardId: number]
 }>()
 
 function edit(){
-  // console.log('gowno')
   _emit('addAnimalModal', true, false, props.animal)
 }
 function deleteAnimal(){
   // console.log('kliknieto mnie')
-  _emit('deleteAnimal', props.animal.animalId!)
+  _emit('deleteAnimal', props.animal.animalId!, props.animal.photos ? props.animal.photos.length > 0? true :false : false)
 }
 
 function addCard(){
@@ -35,28 +42,21 @@ function deleteCard(){
 
 </script>
 <template>
-    <li class="list-row gray-back">
+    <li class="list-row" :class="props.animal.sex == 'M' ? 'blue-male-back' : 'pink-female-back'">
     <div>
-<img
-  v-if="props.animal.photos?.[0]?.imageData"
-  class="size-10 rounded-box"
-  :src="`data:image/${props.animal.photos[0].imageExtension};base64,${props.animal.photos[0].imageData}`"/>
-      <img v-else-if="props.animal.species == 'Pies'" class="size-10 rounded-box" src="@/assets/images/dog.png"/>
-      <img v-else class="size-10 rounded-box" src="@/assets/images/cat.png"/>
+      <img class="size-10 rounded-box" :src="imageSrc"/>
 
     </div>
     <div>
       <div class="flex align-items-center" >
-        {{ props.animal.name }} 
+        {{ animal.name }} 
         <Icon v-if='props.animal.sex == "M"' icon='mdi:gender-male' />
         <Icon v-else icon='mdi:gender-female' /></div>
-      <div class="text-xs font-semibold opacity-60">{{ props.animal.description }}</div>
+      <div class="text-xs font-semibold opacity-60">{{ animal.description }}</div>
       
         
     </div>
-    <!-- <p class="list-col-wrap text-xs">
-      "Remaining Reason" became an instant hit, praised for its haunting sound and emotional depth. A viral performance brought it widespread recognition, making it one of Dio Lupa’s most iconic tracks.
-    </p> -->
+
     <div v-if="props.animal.card" >
         <button class="btn btn-square btn-ghost" @click="deleteCard" >
           <Icon icon="mdi-light:delete" />

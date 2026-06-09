@@ -40,6 +40,12 @@ footer{
 .gray-back{
     background-color: #F5F5F5;
 }
+.pink-female-back{
+background-color: #fbf1fb;
+}
+.blue-male-back{
+background-color: #f0f4fc;
+}
 .page-user{
     min-height: calc(100vh - 5rem);
     display: flex;
@@ -47,4 +53,7 @@ footer{
 }
 .page-content{
     flex: 1;
+}
+.text-error{
+    color: red
 }

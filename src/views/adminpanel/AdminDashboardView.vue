@@ -42,8 +42,8 @@ function openAddAnimalModal(show: boolean, addCard: boolean, animal?: Animal){
 
 }
 
-async function deleteAnimal(animalId: number){
-  await deleteAnimalEndpoint(animalId)
+async function deleteAnimal(animalId: number, hasPhotos: boolean){
+  await deleteAnimalEndpoint(animalId, hasPhotos)
   animals.value = animals.value.filter(animal => animal.animalId !== animalId)
 }
 async function deleteCard(cardId: number){
@@ -90,7 +90,7 @@ function addAnimalToList(newAnimal: Animal){
     animals.value.push(newAnimal)
   }
  }else{
-  window.location.reload()
+  // window.location.reload()
  }
 }
 // const animalTest = ref<Animal>({ name: 'Dominik', description: 'Przyjacielski pies', sex: 'M', age: 5, species: 'Pies' })
