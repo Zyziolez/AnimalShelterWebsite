@@ -42,11 +42,12 @@ const searchAnimal = () => {
   filteredAnimals.value = rawList.filter((card) => {
     if (!card || !card.animal) return false
 
+    // Bezpieczne sprawdzanie gatunku i płci z uodpornieniem na wielkość liter z bazy
     const matchesSpecies = !selectedSpecies.value ||
-      card.animal.species.toLowerCase() === selectedSpecies.value.toLowerCase()
+      (card.animal.species && card.animal.species.toLowerCase() === selectedSpecies.value.toLowerCase())
 
     const matchesSex = !selectedSex.value ||
-      card.animal.sex.toLowerCase() === selectedSex.value.toLowerCase()
+      (card.animal.sex && card.animal.sex.toLowerCase() === selectedSex.value.toLowerCase())
 
     const words = searchText.value.toLowerCase().split(' ').filter(Boolean)
     const searchContent = `${card.animal.name || ''} ${card.animal.species || ''} ${card.animal.description || ''}`.toLowerCase()

@@ -5,6 +5,11 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     pl: {
+      contact: {
+      title: 'Skontaktuj się z nami',
+      foundationName: 'Fundacja dla zwierząt Puszatek',
+      accountLabel: 'Numer konto dla darowizn:'
+    },
       home: {
       title: 'Znajdź swojego nowego przyjaciela',
       subtitle: 'JAKIEGO ZWIERZAKA SZUKASZ?',
@@ -38,6 +43,13 @@ const i18n = createI18n({
         errChooseSex: 'Wybierz płeć',
         errChooseStatus: 'Wybierz status ogłoszenia'
       },
+      navbar: {
+      home: 'STRONA GŁÓWNA',
+      contact: 'KONTAKT'
+    },
+    footer: {
+      copyright: 'Wszelkie prawa zastrzeżone'
+    },
       menu: {
         dashboard: 'Dashboard',
         forms: 'Formularze',
@@ -73,6 +85,18 @@ const i18n = createI18n({
       }
     },
     en: {
+      contact: {
+      title: 'Contact us',
+      foundationName: 'Puszatek Animal Foundation',
+      accountLabel: 'Account number for donations:'
+    },
+      navbar: {
+      home: 'HOME',
+      contact: 'CONTACT'
+    },
+    footer: {
+      copyright: 'All rights reserved'
+    },
       home: {
       title: 'Find Your New Best Friend',
       subtitle: 'WHAT KIND OF PET ARE YOU LOOKING FOR?',
