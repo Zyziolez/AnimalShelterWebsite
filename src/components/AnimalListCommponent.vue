@@ -1,6 +1,5 @@
-
 <script setup lang="ts">
-import {  computed } from 'vue'
+import { computed } from 'vue'
 import { Icon } from '@iconify/vue';
 import {Animal} from '@/types/index.ts'
 import dogImage from './../assets/images/dog.png'
@@ -27,7 +26,6 @@ function edit(){
   _emit('addAnimalModal', true, false, props.animal)
 }
 function deleteAnimal(){
-  // console.log('kliknieto mnie')
   _emit('deleteAnimal', props.animal.animalId!, props.animal.photos ? props.animal.photos.length > 0? true :false : false)
 }
 
@@ -39,39 +37,76 @@ function deleteCard(){
     _emit('deleteCard', props.animal.card.id)
   }
 }
-
 </script>
+
 <template>
-    <li class="list-row" :class="props.animal.sex == 'M' ? 'blue-male-back' : 'pink-female-back'">
-    <div>
-      <img class="size-10 rounded-box" :src="imageSrc"/>
-
+  <li class="list-row" :class="props.animal.sex == 'M' ? 'blue-male-back' : 'pink-female-back'">
+    <div class="flex-shrink-0">
+      <img class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full object-cover shadow-md" :src="imageSrc"/>
     </div>
-    <div>
-      <div class="flex align-items-center" >
+    
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-1 text-base sm:text-lg font-semibold">
         {{ animal.name }} 
-        <Icon v-if='props.animal.sex == "M"' icon='mdi:gender-male' />
-        <Icon v-else icon='mdi:gender-female' /></div>
-      <div class="text-xs font-semibold opacity-60">{{ animal.description }}</div>
-      
-        
+        <Icon v-if='props.animal.sex == "M"' icon='mdi:gender-male' class="text-blue-600" />
+        <Icon v-else icon='mdi:gender-female' class="text-pink-600" />
+      </div>
+      <div class="text-xs sm:text-sm opacity-70 line-clamp-2">{{ animal.description }}</div>
     </div>
 
-    <div v-if="props.animal.card" >
-        <button class="btn btn-square btn-ghost" @click="deleteCard" >
-          <Icon icon="mdi-light:delete" />
+    <div class="flex items-center gap-1 sm:gap-2">
+      <div v-if="props.animal.card">
+        <button class="btn btn-sm btn-circle btn-ghost hover:bg-error/20" @click="deleteCard">
+          <Icon icon="mdi-light:delete" class="text-lg sm:text-xl" />
         </button>
-        </div>
-        <div v-else >
-          <button class="btn btn-square btn-ghost" @click="addCard">
-            <Icon icon="mdi-light:note-plus" />
-          </button>
-        </div>
-    <button class="btn btn-square btn-ghost" @click="edit">
-      <Icon icon="mdi-light:pencil" />
-    </button>
-    <button class="btn btn-square btn-ghost" @click="deleteAnimal" >
-      <Icon icon="mdi-light:delete" />
-    </button>
+      </div>
+      <div v-else>
+        <button class="btn btn-sm btn-circle btn-ghost hover:bg-success/20" @click="addCard">
+          <Icon icon="mdi-light:note-plus" class="text-lg sm:text-xl" />
+        </button>
+      </div>
+      
+      <button class="btn btn-sm btn-circle btn-ghost hover:bg-info/20" @click="edit">
+        <Icon icon="mdi-light:pencil" class="text-lg sm:text-xl" />
+      </button>
+      
+      <button class="btn btn-sm btn-circle btn-ghost hover:bg-error/20" @click="deleteAnimal">
+        <Icon icon="mdi-light:delete" class="text-lg sm:text-xl" />
+      </button>
+    </div>
   </li>
 </template>
+
+<style scoped>
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.list-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 640px) {
+  .list-row {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+}
+
+.blue-male-back {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdef5 100%);
+  border-left: 4px solid #1976d2;
+}
+
+.pink-female-back {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  border-left: 4px solid #c2185b;
+}
+</style>

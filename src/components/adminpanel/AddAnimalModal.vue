@@ -11,13 +11,14 @@ import { useI18n } from 'vue-i18n'
 
 const {postAnimal, updateAnimalWithCard} = useAnimals()
 const photos = ref<{ base64Data: string; imageExtension: string; main: boolean }[]>([])
-const { t} = useI18n()
+const { t } = useI18n()
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const animalSchema = z.object({
   name: z.string().min(1, t('inputsAndErrors.errNameRequired')),
   species: z.enum(['Pies', 'Kot'], { message: t('inputsAndErrors.errChooseSpecies') }),
   age: z.number().min(0).max(25, t('inputsAndErrors.errAge')),
-  sex: z.enum(['M', 'F'], {message: t('inputsAndErrors.errChooseSex')}),
+  sex: z.enum(['M', 'F'], { message: t('inputsAndErrors.errChooseSex') }),
   description: z.string().optional(),
 })
 
@@ -32,7 +33,7 @@ const props = withDefaults(defineProps<{
     sex: 'M',
     description: '',
     photos: [],
-    card: null 
+    card: null
   })
 })
 
@@ -161,86 +162,108 @@ watch(() => props.animal, (newVal: Animal) => {
 
 <template>
   <dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
-    <div class="modal-box white-back">
-      <div class="flex justify-between">
-        <h3 class="font-bold text-lg">{{ t('animal.add') }}</h3>
-        <button class="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
+    <div class="modal-box max-w-lg white-back">
+
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-base-200 white-back">
+        <div>
+          <h3 class="text-lg font-semibold">{{ t('animal.add') }}</h3>
+        </div>
+        <button class="btn btn-sm btn-circle btn-ghost" @click="closeModal">
+          <Icon icon="mdi-light:close" width="18" height="18" />
+        </button>
       </div>
 
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">{{ t('animal.name') }}</legend>
-        <input type="text" class="input" placeholder="Reksio" v-model="name" />
-        <span class="text-error text-xs" v-if="errors.name">{{ errors.name }}</span>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend text-xs">{{ t('animal.name') }}</legend>
+          <input type="text" class="input input-sm w-full" :class="{ 'input-error': errors.name }" placeholder="Reksio" v-model="name" />
+          <span class="text-error text-xs mt-1" v-if="errors.name">{{ errors.name }}</span>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend text-xs">{{ t('animal.species') }}</legend>
+          <select class="select select-sm w-full" :class="{ 'select-error': errors.species }" v-model="species">
+            <option disabled value="">{{ t('animal.species') }}</option>
+            <option value="Pies">{{ t('animal.dog') }}</option>
+            <option value="Kot">{{ t('animal.cat') }}</option>
+          </select>
+          <span class="text-error text-xs mt-1" v-if="errors.species">{{ errors.species }}</span>
+        </fieldset>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend text-xs">{{ t('animal.age') }}</legend>
+          <input type="number" class="input input-sm w-full" :class="{ 'input-error': errors.age }" placeholder="0" min="0" max="25" v-model="age" />
+          <span class="text-error text-xs mt-1" v-if="errors.age">{{ errors.age }}</span>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend text-xs">{{ t('animal.sex') }}</legend>
+          <div class="flex gap-4 h-8 items-center">
+            <label class="flex items-center gap-1.5 text-sm cursor-pointer">
+              <input type="radio" name="sex" v-model="sex" value="M" class="radio radio-xs" />
+              {{ t('animal.male') }}
+            </label>
+            <label class="flex items-center gap-1.5 text-sm cursor-pointer">
+              <input type="radio" name="sex" v-model="sex" value="F" class="radio radio-xs" />
+              {{ t('animal.female') }}
+            </label>
+          </div>
+          <span class="text-error text-xs mt-1" v-if="errors.sex">{{ errors.sex }}</span>
+        </fieldset>
+      </div>
+
+      <fieldset class="fieldset mb-3">
+        <legend class="fieldset-legend text-xs">{{ t('animal.description') }}</legend>
+        <textarea class="textarea textarea-sm w-full resize-none h-20" :placeholder="t('animal.description')" v-model="description"></textarea>
       </fieldset>
 
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">{{ t('animal.species') }}</legend>
-        <select class="select" v-model="species">
-          <option disabled value="">{{ t('animal.species') }}</option>
-          <option value="Pies">{{ t('animal.dog') }}</option>
-          <option value="Kot">{{ t('animal.cat') }}</option>
-        </select>
-        <span class="text-error text-xs" v-if="errors.species">{{ errors.species }}</span>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">{{ t('animal.age') }}</legend>
-        <input type="number" class="input validator" placeholder="Wiek (w latach)" min="0" max="25" v-model="age" />
-        <span class="text-error text-xs" v-if="errors.age">{{ errors.age }}</span>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">{{ t('animal.sex') }}</legend>
-        <label class="label">
-          <input type="radio" name="sex" id="m" v-model="sex" value="M" class="radio" />
-          {{ t('animal.male') }}
-        </label>
-        <label class="label mt-5">
-          <input type="radio" name="sex" id="f" v-model="sex" value="F" class="radio" />
-          {{ t('animal.female') }}
-        </label>
-        <span class="text-error text-xs" v-if="errors.sex">{{ errors.sex }}</span>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">{{ t('animal.description') }}</legend>
-        <textarea class="textarea" placeholder="Opis zwierzaka..." v-model="description"></textarea>
-      </fieldset>
-
-      <fieldset class="fieldset" v-if="props.animal.animalId == 0">
-        <legend class="fieldset-legend">{{ t('animal.image') }}</legend>
-        <input type="file" class="file-input" multiple @change="handleFiles" />
-        <div class="flex gap-2">
-          <div v-for="(photo, index) in photos" :key="index">
-            <img :src="photo.base64Data" class="w-20 h-20 rounded-sm" :class="photo.main ? 'border-2' : null" />
-            <div class="flex gap-1 justify-center">
-              <button v-if="!photo.main" @click="toggleMainPhoto(index)">
-                <Icon icon="mdi-light:heart" width="20" height="20" class="hover:opacity-50" />
+      <fieldset class="fieldset mb-4" v-if="props.animal.animalId == 0">
+        <legend class="fieldset-legend text-xs">{{ t('animal.image') }}</legend>
+        <input type="file" class="hidden" multiple @change="handleFiles" ref="fileInput" />
+        <div
+          class="border border-dashed border-base-300 rounded-lg p-4 flex items-center gap-3 cursor-pointer hover:border-base-content/30 transition-colors"
+          @click="fileInput?.click()"
+        >
+          <Icon icon="mdi-light:upload" width="20" height="20" class="text-base-content/40" />
+          <span class="text-sm text-base-content/50">{{ t('animal.uploadHint') }}</span>
+        </div>
+        <div class="flex gap-2 mt-2 flex-wrap" v-if="photos.length > 0">
+          <div v-for="(photo, index) in photos" :key="index" class="relative">
+            <img :src="photo.base64Data" class="w-16 h-16 rounded-md object-cover" :class="photo.main ? 'ring-2 ring-base-content' : ''" />
+            <div class="flex gap-0.5 justify-center mt-1">
+              <button v-if="!photo.main" @click="toggleMainPhoto(index)" class="btn btn-xs btn-ghost p-0.5">
+                <Icon icon="mdi-light:heart" width="14" height="14" />
               </button>
-              <button v-else @click="toggleMainPhoto(index)">
-                <Icon icon="mdi-light:heart-off" width="20" height="20" class="hover:opacity-50" />
+              <button v-else @click="toggleMainPhoto(index)" class="btn btn-xs btn-ghost p-0.5">
+                <Icon icon="mdi-light:heart-off" width="14" height="14" />
               </button>
-              <button @click="deletePhoto(index)">
-                <Icon icon="mdi-light:delete" width="20" height="20" class="hover:opacity-50" />
+              <button @click="deletePhoto(index)" class="btn btn-xs btn-ghost p-0.5">
+                <Icon icon="mdi-light:delete" width="14" height="14" />
               </button>
             </div>
           </div>
         </div>
       </fieldset>
 
-      <label class="label mt-5">
-        <input type="checkbox" :checked="card != null" class="checkbox" @click="toggleCardStatus" />
-        {{ t('animal.addPost') }}
-      </label>
-      <AnimalPostForm v-if="card != null" @add-animal-post="addCardInfo" :initialStatus="card.status" />
-      <span class="text-error text-xs" v-if="cardError">{{ cardError }}</span>
-
-      <div class="modal-action">
-        <form method="dialog">
-          <button class="btn">{{ t('inputsAndErrors.cancel') }}</button>
-        </form>
-        <button class="btn" @click="onSubmit">{{ t('inputsAndErrors.save') }}</button>
+      <div class="bg-base-200/50 rounded-lg px-4 py-3 flex items-center justify-between mb-4 gray-back">
+        <div>
+          <p class="text-sm font-medium">{{ t('animal.addPost') }}</p>
+        </div>
+        <input type="checkbox" :checked="card != null" class="checkbox checkbox-sm" @click="toggleCardStatus" />
       </div>
+
+      <div v-if="card != null" class="mb-3" >
+        <AnimalPostForm @add-animal-post="addCardInfo" :initialStatus="card.status" />
+        <span class="text-error text-xs mt-1" v-if="cardError">{{ cardError }}</span>
+      </div>
+
+      <div class="flex gap-2 justify-end pt-4 border-t border-base-200">
+        <button class="btn btn-sm btn-ghost" @click="closeModal">{{ t('inputsAndErrors.cancel') }}</button>
+        <button class="btn btn-sm btn-neutral" @click="onSubmit">{{ t('inputsAndErrors.save') }}</button>
+      </div>
+
     </div>
   </dialog>
 </template>
