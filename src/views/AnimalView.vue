@@ -97,7 +97,7 @@ const submitForm = handleSubmit(async (values) => {
     }
 
   } catch (err: any) {
-    console.error("Błąd podczas wysyłania:", err)
+    console.error(t('contactForm.sendError'), err)
     alert(`${t('contactForm.alertError')}${err.message}`)
   }
 })
