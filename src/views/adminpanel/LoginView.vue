@@ -16,6 +16,7 @@ const loginForm = ref({
 })
 
 async function loginClick(){
+    console.log(loginForm.value)
    await login({
         email: loginForm.value.email,
         password: loginForm.value.password

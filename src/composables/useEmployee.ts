@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-
+import { API_URL } from '@/config/api'
 
 export function useEmployee() {
     const loading = ref(false)
@@ -8,9 +8,10 @@ export function useEmployee() {
 
 
 const login = async (userData: { email: string; password: string }) => {
+  console.log('apiurl: ' + API_URL)
     loading.value = true
     try {
-      const response = await fetch('https://localhost:5001/api/Users/authenticate', {
+      const response = await fetch(`${API_URL}/api/Users/authenticate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

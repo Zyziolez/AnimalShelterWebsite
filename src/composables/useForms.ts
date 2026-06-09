@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { API_URL } from '@/config/api'
 
 export function useForms() {
   const formLoading = ref(false)
@@ -19,7 +20,7 @@ export function useForms() {
     formErrorMessage.value = null
     
     try {
-      const response = await fetch('https://localhost:5001/api/Forms', {
+      const response = await fetch(`${API_URL}/api/Forms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

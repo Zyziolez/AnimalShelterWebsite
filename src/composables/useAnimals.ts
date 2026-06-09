@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import type { AnimalCard, Animal } from '@/types/index'
+import { API_URL } from '@/config/api'
 
 const animals = ref<AnimalCard[]>([]) // Dla listy
   const singleAnimal = ref<Animal | null>(null) // Dla detali jednego zwierzaka
@@ -14,7 +15,7 @@ export function useAnimals() {
   const fetchCards = async () => {
     loading.value = true
     try {
-      const response = await fetch('https://localhost:5001/api/Cards')
+      const response = await fetch(`${API_URL}/api/Cards`)
        if (!response.ok) {
       throw new Error('Wystąpił błąd')
     }
@@ -37,7 +38,7 @@ export function useAnimals() {
   const fetchAnimalById = async (id: string | string[]) => {
     loading.value = true
     try {
-      const response = await fetch(`https://localhost:5001/api/Animals/${id}`)
+      const response = await fetch(`${API_URL}/api/Animals/${id}`)
        if (!response.ok) {
       throw new Error('Wystąpił błąd')
     }
@@ -56,7 +57,7 @@ export function useAnimals() {
   const fetchAnimals = async () => {
     loading.value = true
     try {
-      const response = await fetch('https://localhost:5001/api/Animals')
+      const response = await fetch(`${API_URL}/api/Animals`)
        if (!response.ok) {
       throw new Error('Wystąpił błąd')
     }
@@ -75,7 +76,7 @@ export function useAnimals() {
   const fetchAnimalsFiltered = async(searchValue: string, sex: string, species: string) => {
     loading.value = true
     try {
-      const response = await fetch('https://localhost:5001/api/Animals/search?query=' + searchValue)
+      const response = await fetch(`${API_URL}/api/Animals/search?query=` + searchValue)
        if (!response.ok) {
       throw new Error('Wystąpił błąd')
     }
@@ -94,7 +95,7 @@ export function useAnimals() {
 
   const createCard = async (card: AnimalCard) => {
     // console.log(JSON.stringify(card))
-  const response = await fetch('https://localhost:5001/api/Cards', {
+  const response = await fetch(`${API_URL}/api/Cards`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -123,7 +124,7 @@ export function useAnimals() {
 
     loading.value = true
     try {
-      const response = await fetch('https://localhost:5001/api/Animals', {
+      const response = await fetch(`${API_URL}/api/Animals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,20 +188,20 @@ const deleteAnimalEndpoint = async (animalId: number, hasPhotos: boolean) => {
   try {
 
     if(hasPhotos){
-      await fetch(`https://localhost:5001/adminpanel/Photos/animal/${animalId}`, {
+      await fetch(`${API_URL}/adminpanel/Photos/animal/${animalId}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
     }
 
 
-    await fetch(`https://localhost:5001/api/Cards/animal/${animalId}`, {
+    await fetch(`${API_URL}/api/Cards/animal/${animalId}`, {
   method: 'DELETE',
   headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
 })
 
 
-    const response = await fetch(`https://localhost:5001/api/Animals/${animalId}`, {
+    const response = await fetch(`${API_URL}/api/Animals/${animalId}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
@@ -218,7 +219,7 @@ const postCard = async (cardData: AnimalCard) => {
   // loading.value = true
   // console.log(JSON.stringify(cardData))
   try {
-    const response = await fetch('https://localhost:5001/api/Cards', {
+    const response = await fetch(`${API_URL}/api/Cards`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -248,7 +249,7 @@ const postCard = async (cardData: AnimalCard) => {
 const deleteCardEndpoint = async (cardId: number) => {
   loading.value = true
   try {
-    const response = await fetch(`https://localhost:5001/api/Cards/${cardId}`, {
+    const response = await fetch(`${API_URL}/api/Cards/${cardId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -274,7 +275,7 @@ const deleteCardEndpoint = async (cardId: number) => {
 }
 
 const updateAnimal = async (animal: Animal) => {
-    const response = await fetch(`https://localhost:5001/api/Animals/${animal.animalId}`, {
+    const response = await fetch(`${API_URL}/api/Animals/${animal.animalId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -305,7 +306,7 @@ const updateCard = async (card: AnimalCard) => {
   //           status: card.status,
   //           animalId: card.animalId
   //       }))
-    const response = await fetch(`https://localhost:5001/api/Cards/${card.id}`, {
+    const response = await fetch(`${API_URL}/api/Cards/${card.id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
