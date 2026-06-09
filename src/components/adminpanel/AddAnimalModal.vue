@@ -7,15 +7,17 @@ import { Icon } from '@iconify/vue';
 import { z } from 'zod'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useI18n } from 'vue-i18n'
 
 const {postAnimal, updateAnimalWithCard} = useAnimals()
 const photos = ref<{ base64Data: string; imageExtension: string; main: boolean }[]>([])
+const { t} = useI18n()
 
 const animalSchema = z.object({
-  name: z.string().min(1, 'Imię jest wymagane'),
-  species: z.enum(['Pies', 'Kot'], { message: 'Wybierz gatunek' }),
-  age: z.number().min(0).max(25, 'Wiek musi być między 0 a 25'),
-  sex: z.enum(['M', 'F'], {message: 'Wybierz płeć'}),
+  name: z.string().min(1, t('inputsAndErrors.errNameRequired')),
+  species: z.enum(['Pies', 'Kot'], { message: t('inputsAndErrors.errChooseSpecies') }),
+  age: z.number().min(0).max(25, t('inputsAndErrors.errAge')),
+  sex: z.enum(['M', 'F'], {message: t('inputsAndErrors.errChooseSex')}),
   description: z.string().optional(),
 })
 
@@ -61,7 +63,7 @@ const cardError = ref<string | null>(null)
 
 const onSubmit = handleSubmit(async (values) => {
   if (card.value && card.value.status === '') {
-    cardError.value = 'Wybierz status ogłoszenia'
+    cardError.value = t('inputsAndErrors.errChooseStatus')
     return
   }
   cardError.value = null
@@ -161,52 +163,52 @@ watch(() => props.animal, (newVal: Animal) => {
   <dialog id="add-animal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box white-back">
       <div class="flex justify-between">
-        <h3 class="font-bold text-lg">Dodaj zwierzę do bazy</h3>
+        <h3 class="font-bold text-lg">{{ t('animal.add') }}</h3>
         <button class="btn btn-sm btn-circle btn-ghost" @click="closeModal">✕</button>
       </div>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Imię</legend>
+        <legend class="fieldset-legend">{{ t('animal.name') }}</legend>
         <input type="text" class="input" placeholder="Reksio" v-model="name" />
         <span class="text-error text-xs" v-if="errors.name">{{ errors.name }}</span>
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Gatunek</legend>
+        <legend class="fieldset-legend">{{ t('animal.species') }}</legend>
         <select class="select" v-model="species">
-          <option disabled value="">Gatunek</option>
-          <option value="Pies">Pies</option>
-          <option value="Kot">Kot</option>
+          <option disabled value="">{{ t('animal.species') }}</option>
+          <option value="Pies">{{ t('animal.dog') }}</option>
+          <option value="Kot">{{ t('animal.cat') }}</option>
         </select>
         <span class="text-error text-xs" v-if="errors.species">{{ errors.species }}</span>
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Wiek</legend>
+        <legend class="fieldset-legend">{{ t('animal.age') }}</legend>
         <input type="number" class="input validator" placeholder="Wiek (w latach)" min="0" max="25" v-model="age" />
         <span class="text-error text-xs" v-if="errors.age">{{ errors.age }}</span>
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Płeć</legend>
+        <legend class="fieldset-legend">{{ t('animal.sex') }}</legend>
         <label class="label">
           <input type="radio" name="sex" id="m" v-model="sex" value="M" class="radio" />
-          Samiec
+          {{ t('animal.male') }}
         </label>
         <label class="label mt-5">
           <input type="radio" name="sex" id="f" v-model="sex" value="F" class="radio" />
-          Samica
+          {{ t('animal.female') }}
         </label>
         <span class="text-error text-xs" v-if="errors.sex">{{ errors.sex }}</span>
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Opis</legend>
+        <legend class="fieldset-legend">{{ t('animal.description') }}</legend>
         <textarea class="textarea" placeholder="Opis zwierzaka..." v-model="description"></textarea>
       </fieldset>
 
       <fieldset class="fieldset" v-if="props.animal.animalId == 0">
-        <legend class="fieldset-legend">Zdjęcia</legend>
+        <legend class="fieldset-legend">{{ t('animal.image') }}</legend>
         <input type="file" class="file-input" multiple @change="handleFiles" />
         <div class="flex gap-2">
           <div v-for="(photo, index) in photos" :key="index">
@@ -228,16 +230,16 @@ watch(() => props.animal, (newVal: Animal) => {
 
       <label class="label mt-5">
         <input type="checkbox" :checked="card != null" class="checkbox" @click="toggleCardStatus" />
-        Dodaj ogłoszenie
+        {{ t('animal.addPost') }}
       </label>
       <AnimalPostForm v-if="card != null" @add-animal-post="addCardInfo" :initialStatus="card.status" />
       <span class="text-error text-xs" v-if="cardError">{{ cardError }}</span>
 
       <div class="modal-action">
         <form method="dialog">
-          <button class="btn">Anuluj</button>
+          <button class="btn">{{ t('inputsAndErrors.cancel') }}</button>
         </form>
-        <button class="btn" @click="onSubmit">Zapisz</button>
+        <button class="btn" @click="onSubmit">{{ t('inputsAndErrors.save') }}</button>
       </div>
     </div>
   </dialog>

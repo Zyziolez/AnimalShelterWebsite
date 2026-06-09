@@ -1,5 +1,8 @@
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 function logout(){
     localStorage.removeItem('token')
@@ -30,13 +33,14 @@ function logout(){
           </svg>
         </label>
       </div>
-      <div class="mx-2 flex-1 px-2">Admin Panel</div>
+      <div class="mx-2 flex-1 px-2"></div>
       <div class="hidden flex-none lg:block">
         <ul class="menu menu-horizontal">
-          <li><RouterLink to="/admin" ><button class="btn btn-ghost" >Dashboard</button></RouterLink></li>
-          <li><RouterLink to="/admin/forms"><button class="btn btn-ghost">Formularze</button></RouterLink></li>
-        <li><button class="btn btn-ghost" @click="logout">Wyloguj</button></li>
-          
+          <li><RouterLink to="/admin" ><button class="btn btn-ghost" >{{t('menu.dashboard')}}</button></RouterLink></li>
+          <li><RouterLink to="/admin/forms"><button class="btn btn-ghost">{{t('menu.forms')}}</button></RouterLink></li>
+        <li><button class="btn btn-ghost" @click="logout">{{t('menu.logOut')}}</button></li>
+           <li><button class="btn btn-ghost" @click="locale = 'en'">EN</button></li>
+            <li><button class="btn btn-ghost" @click="locale = 'pl'">PL</button></li>
         </ul>
       </div>
     </div>
@@ -47,11 +51,12 @@ function logout(){
   <div class="drawer-side">
     <label htmlFor="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
     <ul class="menu menu-horizontal">
-          <li><button class="btn btn-ghost">Panel</button></li>
-          <li><button class="btn btn-ghost">Formularze</button></li>
-          <li><button class="btn btn-ghost" @click="logout">Wyloguj</button></li>
+          <li><button class="btn btn-ghost">{{t('menu.dashboard')}}</button></li>
+          <li><button class="btn btn-ghost">{{t('menu.forms')}}</button></li>
+          <li><button class="btn btn-ghost" @click="logout">{{t('menu.logOut')}}</button></li>
           
-          
+            <li><button class="btn btn-ghost" @click="locale = 'en'">EN</button></li>
+            <li><button class="btn btn-ghost" @click="locale = 'pl'">PL</button></li>
         </ul>
   </div>
 </div>

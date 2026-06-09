@@ -1,7 +1,9 @@
 <script setup lang="ts">
 // import { Icon } from '@iconify/vue'
 import {ref} from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const _emit = defineEmits<{
   addAnimalModal: [modalOpen: boolean, addCard: boolean],
   fetchAnimalNameEmit: [searchValue: string, sex: string, species: string]
@@ -23,46 +25,31 @@ function searchAnimal (){
 <template>
     <div class="white-back" >
   <div class="flex gap-5 " >
-    <h1 class="flex-4 text-2xl" >Zwierzaki w bazie</h1>
-    <input v-model="searchBarValue" @input="searchAnimal" type="text"  placeholder="Wyszukaj..." class="input input-bordered flex-4" />
-    <button @click="openAddAnimalModal" class="btn btn-primary flex-1" >Dodaj</button>
+    <h1 class="flex-4 text-2xl" >{{ t('mainPanel.animalsInDb') }}</h1>
+    <input v-model="searchBarValue" @input="searchAnimal" type="text"  :placeholder="$t('mainPanel.search')" class="input input-bordered flex-4" />
+    <button @click="openAddAnimalModal" class="btn btn-primary flex-1" >{{ t('mainPanel.add') }}</button>
   </div>
   <div >
     
     <div class="flex gap-4" >
             <fieldset class="fieldset">
                 <select v-model="selectedSex" class="select select-ghost" @change="searchAnimal" >
-                  <option value="" >Wszystkie płcie</option>
-                  <option value="F" >Samice</option>
-                  <option value="M">Samce</option>
+                  <option value="" >{{ t('mainPanel.allGenders') }}</option>
+                  <option value="F" >{{ t('animal.female') }}</option>
+                  <option value="M">{{ t('animal.male') }}</option>
                 </select>
          </fieldset>
          <fieldset class="fieldset">
              <select v-model="selectedSpecies" class="select select-ghost" @change="searchAnimal" >
-              <option value="" >Wszystkie gatunki</option>
-              <option value="Kot" >Koty</option>
-              <option value="Pies">Psy</option>
+              <option value="" >{{ t('mainPanel.allSpecies') }}</option>
+              <option value="Kot" >{{ t('mainPanel.cats') }}</option>
+              <option value="Pies">{{ t('mainPanel.dogs') }}</option>
             </select>
          </fieldset>
 
     </div>
 
     <div class="dropdown dropdown-end">
-      <!-- <div tabIndex="0" role="button" class="btn btn-ghost">
-        <Icon icon="flowbite:adjustments-horizontal-outline" width="24" height="24" />
-      </div>
-      <ul
-        tabIndex="-1"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a class="justify-between">
-            Profile
-            <span class="badge">New</span>
-          </a>
-        </li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
-      </ul> -->
     </div>
  
 </div>

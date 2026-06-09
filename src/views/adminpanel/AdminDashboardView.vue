@@ -7,10 +7,11 @@ import AnimalListCommponent from '@/components/AnimalListCommponent.vue';
 // import UploadPhoto from '@/components/adminpanel/UploadPhoto.vue';
 import AddAnimalModal from '@/components/adminpanel/AddAnimalModal.vue';
 import {Animal} from '@/types/index.ts'
-import { esmExternalRequirePlugin } from 'vite';
+
 
 const { animalsList, fetchAnimals, deleteAnimalEndpoint, loading, deleteCardEndpoint } = useAnimals()
 const animals = ref<Animal[]>([])
+
 
 onMounted(async () => {
   
