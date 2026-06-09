@@ -1,55 +1,76 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AdoptionFormCard from '@/components/adminpanel/AdoptionFormCard.vue'
-import type { AdoptionForm } from '@/assets/AdoptionForm'
+import { useAdoptionForms } from '@/composables/useAdoptionForms'
 
-//Dane testowe
-const adoptionForms = ref<AdoptionForm[]>([
-  {
-    id: 1,
-    date: '2026-01-12',
-    firstName: 'Anna',
-    lastName: 'Kowalska',
-    mail: 'anna.kowalska@example.com',
-    phoneNumber: '123 456 789',
-    content:
-      'Chciałabym adoptować Burka, ponieważ mam doświadczenie w opiece nad psami. Mieszkam w spokojnej okolicy i mam dużo czasu na spacery.',
-    animalId: 1,
-    animalName: 'Burek',
-    animalSpecies: 'Pies'
-  },
-  {
-    id: 2,
-    date: '2026-01-15',
-    firstName: 'Michał',
-    lastName: 'Nowak',
-    mail: 'michal.nowak@example.com',
-    phoneNumber: '987 654 321',
-    content:
-      'Interesuje mnie adopcja Luny. Mam dom z ogrodem, a wcześniej miałem już kota. Chciałbym zapewnić jej bezpieczny dom.',
-    animalId: 2,
-    animalName: 'Luna',
-    animalSpecies: 'Kot'
-  }
-])
+const { t } = useI18n()
+
+const {
+  adoptionForms,
+  loading,
+  errorMessage,
+  fetchAdoptionForms
+} = useAdoptionForms()
+
+onMounted(async () => {
+  await fetchAdoptionForms()
+})
 </script>
 
 <template>
-  <div class="mt-4 w-4/5 mx-auto pb-10">
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold">Formularze adopcyjne</h1>
+  <main class="page-user white-back min-h-screen">
+    <section class="w-4/5 mx-auto py-8">
+      <div class="blue-back rounded-box p-6 mb-6">
+        <h1 class="text-3xl font-bold">
+          {{ t('adminForms.title') }}
+        </h1>
 
-      <p class="mt-2 opacity-70">
-        Lista formularzy przesłanych przez osoby zainteresowane adopcją zwierząt.
-      </p>
-    </div>
+        <p class="mt-2 opacity-70">
+          {{ t('adminForms.description') }}
+        </p>
+      </div>
 
-    <div class="grid gap-4">
-      <AdoptionFormCard
-        v-for="form in adoptionForms"
-        :key="form.id"
-        :form="form"
-      />
-    </div>
-  </div>
+      <div v-if="loading" class="white-back rounded-box p-5 border border-base-300">
+        {{ t('adminForms.loading') }}
+      </div>
+
+      <div v-else-if="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <div
+        v-else-if="adoptionForms.length === 0"
+        class="white-back rounded-box p-5 border border-base-300"
+      >
+        {{ t('adminForms.empty') }}
+      </div>
+
+      <TransitionGroup
+        v-else
+        name="forms-list"
+        tag="div"
+        class="grid gap-4"
+      >
+        <AdoptionFormCard
+          v-for="form in adoptionForms"
+          :key="form.id"
+          :form="form"
+        />
+      </TransitionGroup>
+    </section>
+  </main>
 </template>
+
+<style scoped>
+.forms-list-enter-active,
+.forms-list-leave-active {
+  transition: all 0.25s ease;
+}
+
+.forms-list-enter-from,
+.forms-list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>

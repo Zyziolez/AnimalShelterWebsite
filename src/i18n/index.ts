@@ -41,10 +41,10 @@ const i18n = createI18n({
       menu: {
         dashboard: 'Dashboard',
         forms: 'Formularze',
-        adminPanel: 'Panel Adnimistratora',
+        adminPanel: 'Panel Administratora',
         logOut: 'Wyloguj'
       },
-      mainPanel:{
+      mainPanel: {
         animalsInDb: 'Zwierzaki w bazie',
         add: 'Dodaj',
         allGenders: 'Wszystkie płcie',
@@ -52,6 +52,24 @@ const i18n = createI18n({
         cats: 'Koty',
         dogs: 'Psy',
         search: 'Wyszukaj'
+      },
+      adminForms: {
+        title: 'Formularze adopcyjne',
+        description: 'Lista formularzy przesłanych przez osoby zainteresowane adopcją.',
+        loading: 'Ładowanie formularzy...',
+        empty: 'Brak przesłanych formularzy.',
+        fetchError: 'Nie udało się pobrać formularzy adopcyjnych.',
+        expand: 'Rozwiń',
+        collapse: 'Zwiń',
+        formId: 'Formularz ID',
+        firstName: 'Imię',
+        lastName: 'Nazwisko',
+        email: 'Email',
+        phone: 'Telefon',
+        phoneNumber: 'Numer telefonu',
+        animalId: 'ID zwierzęcia',
+        sentDate: 'Data wysłania',
+        content: 'Treść formularza'
       }
     },
     en: {
@@ -77,14 +95,14 @@ const i18n = createI18n({
         description: 'Description',
         image: 'Image',
         addPost: 'Add post',
-        chooseFile: 'Wybierz pliki'
+        chooseFile: 'Choose files'
       },
       inputsAndErrors: {
         cancel: 'Cancel',
         save: 'Save',
         errNameRequired: 'Name is required',
         errChooseSpecies: 'Choose species',
-        errAge: 'Age bust be between 0 and 25',
+        errAge: 'Age must be between 0 and 25',
         errChooseSex: 'Choose sex',
         errChooseStatus: 'Choose post status'
       },
@@ -94,7 +112,7 @@ const i18n = createI18n({
         adminPanel: 'Admin Panel',
         logOut: 'Log out'
       },
-       mainPanel:{
+      mainPanel: {
         animalsInDb: 'Animals in database',
         add: 'Add',
         allGenders: 'All genders',
@@ -102,6 +120,24 @@ const i18n = createI18n({
         cats: 'Cats',
         dogs: 'Dogs',
         search: 'Search'
+      },
+      adminForms: {
+        title: 'Adoption forms',
+        description: 'List of forms submitted by people interested in adoption.',
+        loading: 'Loading forms...',
+        empty: 'No submitted forms.',
+        fetchError: 'Failed to load adoption forms.',
+        expand: 'Expand',
+        collapse: 'Collapse',
+        formId: 'Form ID',
+        firstName: 'First name',
+        lastName: 'Last name',
+        email: 'Email',
+        phone: 'Phone',
+        phoneNumber: 'Phone number',
+        animalId: 'Animal ID',
+        sentDate: 'Submitted date',
+        content: 'Form content'
       }
     }
   }
