@@ -1,8 +1,33 @@
 import { createI18n } from 'vue-i18n'
+// funkcja ucząca vue-i18n polskiej gramatyki
+function plPluralizationRule(choice: number, choicesLength: number) {
+  if (choice === 0) {
+    return 0; // 0 lat
+  }
+  if (choice === 1) {
+    return 1; // 1 rok
+  }
+  
+  const remainder = choice % 10;
+  const tens = Math.floor(choice % 100 / 10);
+  
+  if (tens === 1) {
+    return 3; // 10-19 lat
+  }
+  
+  if (remainder >= 2 && remainder <= 4) {
+    return 2; // 2, 3, 4, 22, 23, 24... lata
+  }
+  
+  return 3; // 5, 6, 7, 8, 9, 20, 25... lat
+}
+
 
 const i18n = createI18n({
   locale: 'pl',
   fallbackLocale: 'en',
+  pluralizationRules: {
+  'pl': plPluralizationRule },
   messages: {
     pl: {
       home: {
@@ -19,6 +44,7 @@ const i18n = createI18n({
         name: 'Imię',
         species: 'Gatunek',
         age: 'Wiek',
+        age_format: '0 lat | 1 rok | {count} lata | {count} lat',
         sex: 'Płeć',
         male: 'Samiec',
         female: 'Samica',
@@ -27,7 +53,26 @@ const i18n = createI18n({
         description: 'Opis',
         image: 'Zdjęcie',
         addPost: 'Dodaj ogłoszenie',
-        chooseFile: 'Wybierz pliki'
+        chooseFile: 'Wybierz pliki',
+        loading: 'Ładowanie danych zwierzaka...',
+        allPhotos: 'Wszystkie zdjęcia',
+        mainPhoto: '★ Zdjęcie główne',
+        photoNumber: 'Zdjęcie',
+        notFound: 'Nie znaleziono wybranego zwierzęcia.'
+      },
+      contactForm: {
+        title: 'Formularz kontaktowy',
+        contactFormTitle: 'Formularz w sprawie:',
+        contactButton: 'Kontakt w sprawie zwierzaka',
+        lastName: 'Nazwisko',
+        email: 'Adres e-mail',
+        phone: 'Numer telefonu',
+        message: 'Treść',
+        cancel: 'Anuluj',
+        send: 'Wyślij',
+        success: 'Formularz został pomyślnie wysłany!',
+        serverError: 'Wystąpił błąd po stronie serwera.',
+        alertError: 'Nie udało się wysłać zgłoszenia. Szczegóły: '
       },
       inputsAndErrors: {
         cancel: 'Anuluj',
@@ -36,7 +81,11 @@ const i18n = createI18n({
         errChooseSpecies: 'Wybierz gatunek',
         errAge: 'Wiek musi być między 0 a 25',
         errChooseSex: 'Wybierz płeć',
-        errChooseStatus: 'Wybierz status ogłoszenia'
+        errChooseStatus: 'Wybierz status ogłoszenia',
+        required: 'Pole nie może być puste',
+        email: 'Niepoprawny format adresu e-mail',
+        phone: 'Niepoprawny numer telefonu (min. 9 cyfr)',
+        messageRequired: 'Treść zgłoszenia nie może być pusta'
       },
       menu: {
         dashboard: 'Dashboard',
@@ -87,6 +136,7 @@ const i18n = createI18n({
         name: 'Name',
         species: 'Species',
         age: 'Age',
+        age_format: '0 years | 1 year | {count} years',
         sex: 'Sex',
         male: 'Male',
         female: 'Female',
@@ -95,7 +145,26 @@ const i18n = createI18n({
         description: 'Description',
         image: 'Image',
         addPost: 'Add post',
-        chooseFile: 'Choose files'
+        chooseFile: 'Choose files',
+        loading: 'Loading animal data...',
+        allPhotos: 'All photos', 
+        mainPhoto: '★ Main photo', 
+        photoNumber: 'Photo', 
+        notFound: 'Selected animal not found.'
+      },
+      contactForm: {
+        title: 'Contact form',
+        contactFormTitle: 'Contact form for:',
+        contactButton: 'Contact form',
+        lastName: 'Last name',
+        email: 'E-mail address',
+        phone: 'Phone number',
+        message: 'Message',
+        cancel: 'Cancel',
+        send: 'Send',
+        success: 'The form has been sent successfully!',
+        serverError: 'A server-side error occurred.',
+        alertError: 'Failed to send the request. Details: '
       },
       inputsAndErrors: {
         cancel: 'Cancel',
@@ -104,7 +173,11 @@ const i18n = createI18n({
         errChooseSpecies: 'Choose species',
         errAge: 'Age must be between 0 and 25',
         errChooseSex: 'Choose sex',
-        errChooseStatus: 'Choose post status'
+        errChooseStatus: 'Choose post status',
+        required: 'This field cannot be empty',
+        email: 'Invalid e-mail address format',
+        phone: 'Invalid phone number (min. 9 digits)',
+        messageRequired: 'Message content cannot be empty'
       },
       menu: {
         dashboard: 'Dashboard',
