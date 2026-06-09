@@ -164,7 +164,7 @@ const submitForm = handleSubmit(async (values) => {
                 class="w-40 h-40 object-cover rounded-box" 
               />
               <div class="text-xs text-center mt-2 font-semibold opacity-60">
-                {{ index === 0 ? t('animal.mainPhoto')' : ` #${index + 1}` }}
+                {{ index === 0 ? '★ Zdjęcie główne' : `Zdjęcie #${index + 1}` }}
               </div>
             </div>
           </div>
