@@ -29,4 +29,5 @@ export interface AnimalCard {
   date: number
   status: string
   animalId: number
+  animal: Animal
 }

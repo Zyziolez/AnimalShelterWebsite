@@ -5,6 +5,15 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     pl: {
+      home: {
+      title: 'Znajdź swojego nowego przyjaciela',
+      subtitle: 'JAKIEGO ZWIERZAKA SZUKASZ?',
+      searchBtn: 'Szukaj',
+      anyGender: 'Dowolna',
+      anySpecies: 'Wszystkie',
+      keywordLabel: 'IMIĘ LUB CECHA CHARAKTERU:',
+      placeholder: 'Wpisz np. Sonia, wesoły...'
+    },
       animal: {
         add: 'Dodaj zwierzę do bazy',
         name: 'Imię',
@@ -46,6 +55,15 @@ const i18n = createI18n({
       }
     },
     en: {
+      home: {
+      title: 'Find Your New Best Friend',
+      subtitle: 'WHAT KIND OF PET ARE YOU LOOKING FOR?',
+      searchBtn: 'Search',
+      anyGender: 'Any',
+      anySpecies: 'All',
+      keywordLabel: 'NAME OR CHARACTERISTIC:',
+      placeholder: 'Enter e.g. Sonia...'
+    },
       animal: {
         add: 'Add animal to database',
         name: 'Name',
