@@ -11,6 +11,7 @@ import { useForms } from '@/composables/useForms.ts'
 // domyślne obrazki
 import dogImage from './../assets/images/dog.png'
 import catImage from './../assets/images/cat.png'
+import vCapitalize from '@/directives/capitalize'
 
 const router = useRouter()
 const route = useRoute()
@@ -187,7 +188,7 @@ const submitForm = handleSubmit(async (values) => {
                 
                 <div class="form-control">
                   <label class="label font-bold text-sm">Imię:</label>
-                  <input v-model="firstName" type="text" class="input input-bordered w-full" />
+                  <input v-model="firstName" v-capitalize type="text" class="input input-bordered w-full" />
                   <span class="text-error text-xs mt-1 font-semibold">
                     {{ firstNameError?.includes('undefined') ? 'Pole nie może być puste' : firstNameError }}
                   </span>
@@ -195,7 +196,7 @@ const submitForm = handleSubmit(async (values) => {
 
                 <div class="form-control">
                   <label class="label font-bold text-sm">Nazwisko:</label>
-                  <input v-model="lastName" type="text" class="input input-bordered w-full" />
+                  <input v-model="lastName" v-capitalize type="text" class="input input-bordered w-full" />
                   <span class="text-error text-xs mt-1 font-semibold">
                     {{ lastNameError?.includes('undefined') ? 'Pole nie może być puste' : lastNameError }}
                   </span>
@@ -218,7 +219,7 @@ const submitForm = handleSubmit(async (values) => {
                 </div>
 
                 <div class="form-control">
-                  <label class="label font-bold text-sm">Treść zgłoszenia (Uzasadnienie):</label>
+                  <label class="label font-bold text-sm">Treść:</label>
                   <textarea v-model="content" rows="4" class="textarea textarea-bordered w-full"></textarea>
                   <span class="text-error text-xs mt-1 font-semibold">
                     {{ contentError?.includes('undefined') ? 'Treść zgłoszenia nie może być pusta' : contentError }}
