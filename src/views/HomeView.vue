@@ -92,19 +92,19 @@ const goToDetails = (id?: number) => {
           <div class="grid grid-cols-3 gap-3 max-w-xl mx-auto">
             <button
               @click="selectedSpecies = 'Pies'"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Pies' ? 'bg-neutral-300 text-neutral-800 border-neutral-400' : 'btn-outline border-base-300 bg-base-100']"
+              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Pies' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
             >
               {{ t('animal.dog') }}
             </button>
             <button
               @click="selectedSpecies = 'Kot'"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Kot' ? 'bg-neutral-300 text-neutral-800 border-neutral-400' : 'btn-outline border-base-300 bg-base-100']"
+              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Kot' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
             >
               {{ t('animal.cat') }}
             </button>
             <button
               @click="resetFilters"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === '' && selectedSex === '' && searchText === '' ? 'bg-neutral-300 text-neutral-800 border-neutral-400' : 'btn-outline border-base-300 bg-base-100']"
+              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === '' && selectedSex === '' && searchText === '' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
             >
               {{ t('home.anySpecies') }}
             </button>
@@ -120,19 +120,19 @@ const goToDetails = (id?: number) => {
             <div class="grid grid-cols-3 gap-2 bg-base-200 p-1.5 rounded-xl border border-base-300">
               <button
                 @click="selectedSex = 'M'"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'M' ? 'bg-neutral-300 text-neutral-800 shadow' : 'bg-transparent text-base-content/80 hover:bg-base-300']"
+                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'M' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
               >
                 {{ t('animal.male') }}
               </button>
               <button
                 @click="selectedSex = 'F'"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'F' ? 'bg-neutral-300 text-neutral-800 shadow' : 'bg-transparent text-base-content/80 hover:bg-base-300']"
+                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'F' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
               >
                 {{ t('animal.female') }}
               </button>
               <button
                 @click="selectedSex = ''"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === '' ? 'bg-neutral-300 text-neutral-800 shadow' : 'bg-transparent text-base-content/80 hover:bg-base-300']"
+                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === '' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
               >
                 {{ t('home.anyGender') }}
               </button>
@@ -161,6 +161,60 @@ const goToDetails = (id?: number) => {
       </div>
     </div>
 
+    <TransitionGroup
+      v-if="filteredAnimals.length > 0"
+      name="fade-cards"
+      tag="div"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+    >
+      <div
+        v-for="card in filteredAnimals"
+        :key="card.id"
+        class="card bg-base-100 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-base-200 rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full transform"
+        @click="goToDetails(card.animal?.animalId)"
+      >
+        <figure class="relative h-60 w-full bg-base-200">
+          <img
+            :src="formatBase64(card.animal?.photos?.[0]?.base64Data || card.animal?.photo?.[0]?.base64Data || card.animal?.photos?.[0]?.imageData || card.animal?.photo?.[0]?.imageData)"
+            alt="animal"
+            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
+          <div class="absolute top-3 right-3 badge font-bold px-3 py-2.5 shadow text-xs">
+            {{ card.status }}
+          </div>
+        </figure>
+
+        <div class="card-body p-5 flex flex-col flex-grow bg-base-100 text-base-content">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-2xl font-black tracking-tight text-base-content">
+              {{ card.animal?.name || 'Zwierzak' }}
+            </h3>
+            <span class="badge badge-neutral badge-md gap-1 font-semibold">
+              {{ card.animal?.species === 'Pies' ? t('animal.dog') : t('animal.cat') }} •
+              {{ card.animal?.sex === 'M' ? t('animal.male') : t('animal.female') }}
+            </span>
+          </div>
+
+          <p class="text-base-content/70 text-sm line-clamp-3 leading-relaxed flex-grow mt-1">
+            {{ card.animal?.description || '...' }}
+          </p>
+
+          <div class="mt-4 pt-3 border-t border-base-200 flex justify-between items-center text-xs font-semibold text-base-content/50">
+            <span>{{ t('animal.age') }}: {{ card.animal?.age }} lat/a</span>
+            <span class="text-primary font-bold inline-flex items-center gap-0.5 text-sm">
+              Zobacz profil ➔
+            </span>
+          </div>
+        </div>
+      </div>
+    </TransitionGroup>
+
+    <div v-else class="text-center py-16 bg-base-100 rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6">
+      <p class="text-lg font-medium text-base-content/60 mb-4">{{ t('inputsAndErrors.errChooseSpecies') }}</p>
+      <button class="btn btn-outline font-bold px-6" @click="resetFilters">
+        {{ t('home.anySpecies') }}
+      </button>
+    </div>
     <TransitionGroup
       v-if="filteredAnimals.length > 0"
       name="fade-cards"
