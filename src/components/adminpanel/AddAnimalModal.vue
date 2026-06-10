@@ -253,7 +253,7 @@ watch(() => props.animal, (newVal: Animal) => {
           @click="fileInput?.click()"
         >
           <Icon icon="mdi-light:upload" width="20" height="20" class="text-base-content/40" />
-          <span class="text-sm text-base-content/50">{{ t('animal.uploadHint') }}</span>
+          <span class="text-sm text-base-content/50">{{ t('animal.chooseFile') }}</span>
         </div>
         <div class="flex gap-2 mt-2 flex-wrap" v-if="photos.length > 0">
           <div v-for="(photo, index) in photos" :key="index + '-' + photo.main" class="relative">

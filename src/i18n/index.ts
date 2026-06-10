@@ -61,6 +61,11 @@ const i18n = createI18n({
         animalId: 'ID zwierzęcia',
         sentDate: 'Data wysłania',
         content: 'Treść formularza'
+      },
+      login: {
+        login: 'Zaloguj',
+        email: 'Adres e-mail',
+        pass: 'Hasło'
       }
     },
     en: {

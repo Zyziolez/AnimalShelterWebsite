@@ -8,11 +8,21 @@ import {Animal} from '@/types/index.ts'
 
 const { animalsList, fetchAnimals, deleteAnimalEndpoint, loading, deleteCardEndpoint } = useAnimals()
 const animals = ref<Animal[]>([])
+const searchParams = ref({ searchValue: '', sex: '', species: '' })
 
 onMounted(async () => {
-  await fetchAnimals()
-  animals.value = [...animalsList.value]
+ await fetchAnimals()
+  filterAnimals()
 })
+
+function filterAnimals() {
+  animals.value = [...animalsList.value].filter(animal => {
+    const matchesName = animal.name.toLowerCase().includes(searchParams.value.searchValue.toLowerCase())
+    const matchesSex = searchParams.value.sex ? animal.sex === searchParams.value.sex : true
+    const matchesSpecies = searchParams.value.species ? animal.species === searchParams.value.species : true
+    return matchesName && matchesSex && matchesSpecies
+  })
+}
 
 const selectedAnimal = ref<Animal | undefined>(undefined)
 
@@ -39,35 +49,36 @@ function openAddAnimalModal(show: boolean, addCard: boolean, animal?: Animal){
 
 async function deleteAnimal(animalId: number, hasPhotos: boolean){
   await deleteAnimalEndpoint(animalId, hasPhotos)
-  animals.value = animals.value.filter(animal => animal.animalId !== animalId)
-}
+  const indexInList = animalsList.value.findIndex(a => a.animalId === animalId)
+  if (indexInList !== -1) {
+    animalsList.value.splice(indexInList, 1)
+  }
 
+  filterAnimals()
+}
 async function deleteCard(cardId: number){
   await deleteCardEndpoint(cardId)
-  animals.value = animals.value.map(animal => {
-    if(animal.card && animal.card.id === cardId){
-      return {...animal, card: null}
-    }
-    return animal
-  })
+  // Zaktualizuj w animalsList
+  const animalInList = animalsList.value.find(a => a.card?.id === cardId)
+  if (animalInList && animalInList.card) {
+    animalInList.card = null
+  }
+
+  filterAnimals()
 }
 
-function serachAnimalByName(searchValue: string, sex: string, species: string){
-  animals.value = [...animalsList.value].filter(animal => {
-    const matchesName = animal.name.toLowerCase().includes(searchValue.toLowerCase())
-    const matchesSex = sex ? animal.sex === sex : true
-    const matchesSpecies = species ? animal.species === species : true
-    return matchesName && matchesSex && matchesSpecies
-  })
+function searchAnimalByName(searchValue: string, sex: string, species: string){
+  searchParams.value = { searchValue, sex, species }
+  filterAnimals()
 }
 
 function addAnimalToList(newAnimal: Animal){
  if(newAnimal){
-   const index = animals.value.findIndex(a => a.animalId === newAnimal.animalId)
+   const index = animalsList.value.findIndex(a => a.animalId === newAnimal.animalId)
   
   if(index !== -1){
-    animals.value[index] = {
-      ...animals.value[index],
+    animalsList.value[index] = {
+      ...animalsList.value[index],
       species: newAnimal.species,
       name: newAnimal.name,
       age: newAnimal.age,
@@ -76,9 +87,9 @@ function addAnimalToList(newAnimal: Animal){
       card: newAnimal.card
     }
   } else {
-    // console.log(newAnimal)
-    animals.value.push(newAnimal)
+    animalsList.value.push(newAnimal)
   }
+  filterAnimals()
  }
 }
 </script>
@@ -90,7 +101,7 @@ function addAnimalToList(newAnimal: Animal){
         <div class="mb-6 sm:mb-8">
           <SearchBar 
             @add-animal-modal="openAddAnimalModal" 
-            @fetch-animal-name-emit="serachAnimalByName" 
+            @fetch-animal-name-emit="searchAnimalByName" 
           />
         </div>
 
