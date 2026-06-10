@@ -115,8 +115,8 @@ const getStatusBadgeClass = (status?: string) => {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 py-6">
-    <div class="bg-base-100 rounded-2xl border border-base-300 shadow-xl p-6 md:p-8 mb-10">
+  <div class="max-w-6xl mx-auto px-4 py-6 ">
+    <div class="rounded-2xl border border-base-300 shadow-xl p-6 md:p-8 mb-10 white-back">
       <h2 class="text-3xl font-extrabold text-center tracking-tight text-base-content mb-8">
         {{ t('home.title') }}
       </h2>
@@ -165,12 +165,12 @@ const getStatusBadgeClass = (status?: string) => {
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-base-200 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-base-200 items-end ">
           <div class="flex flex-col justify-center">
             <span class="text-sm font-bold uppercase tracking-wider text-base-content/70 mb-3">
               {{ t('animal.sex') }}:
             </span>
-            <div class="grid grid-cols-3 gap-2 bg-base-200 p-1.5 rounded-xl border border-base-300">
+            <div class="grid grid-cols-3 gap-2  p-1.5 rounded-xl border border-base-300 white-back">
               <button
                 @click="selectedSex = 'M'"
                 :class="[
@@ -207,7 +207,7 @@ const getStatusBadgeClass = (status?: string) => {
             </div>
           </div>
 
-          <div class="form-control w-full">
+          <div class="form-control w-full ">
             <span class="text-sm font-bold uppercase tracking-wider text-base-content/70 mb-3">
               {{ t('home.keywordLabel') }}
             </span>
@@ -289,7 +289,7 @@ const getStatusBadgeClass = (status?: string) => {
 
     <div
       v-else
-      class="text-center py-16 bg-base-100 rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6"
+      class="text-center py-16 white-back rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6"
     >
       <p class="text-lg font-medium text-base-content/60 mb-4">
         {{ t('inputsAndErrors.errChooseSpecies') }}
