@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue' // Dodane brakujące importy computed i watch
 import { useRouter } from 'vue-router'
 import { useAnimals } from '@/composables/useAnimals'
 import { useI18n } from 'vue-i18n'
@@ -29,7 +29,11 @@ const searchAnimal = () => {
   if (animals.value) {
     if (Array.isArray(animals.value)) {
       rawList = animals.value
-    } else if (typeof animals.value === 'object' && 'data' in animals.value && Array.isArray((animals.value as any).data)) {
+    } else if (
+      typeof animals.value === 'object' &&
+      'data' in animals.value &&
+      Array.isArray((animals.value as any).data)
+    ) {
       rawList = (animals.value as any).data
     }
   }
@@ -42,15 +46,18 @@ const searchAnimal = () => {
   filteredAnimals.value = rawList.filter((card) => {
     if (!card || !card.animal) return false
 
-    // Bezpieczne sprawdzanie gatunku i płci z uodpornieniem na wielkość liter z bazy
-    const matchesSpecies = !selectedSpecies.value ||
-      (card.animal.species && card.animal.species.toLowerCase() === selectedSpecies.value.toLowerCase())
+    const matchesSpecies =
+      !selectedSpecies.value ||
+      (card.animal.species &&
+        card.animal.species.toLowerCase() === selectedSpecies.value.toLowerCase())
 
-    const matchesSex = !selectedSex.value ||
+    const matchesSex =
+      !selectedSex.value ||
       (card.animal.sex && card.animal.sex.toLowerCase() === selectedSex.value.toLowerCase())
 
     const words = searchText.value.toLowerCase().split(' ').filter(Boolean)
-    const searchContent = `${card.animal.name || ''} ${card.animal.species || ''} ${card.animal.description || ''}`.toLowerCase()
+    const searchContent =
+      `${card.animal.name || ''} ${card.animal.species || ''} ${card.animal.description || ''}`.toLowerCase()
     const matchesText = words.every((word) => searchContent.includes(word))
 
     return matchesSpecies && matchesSex && matchesText
@@ -74,11 +81,41 @@ const goToDetails = (id?: number) => {
     router.push(`/animal/${id}`)
   }
 }
+
+const currentPage = ref(1)
+const itemsPerPage = 6
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredAnimals.value.length / itemsPerPage)
+})
+
+const paginatedAnimals = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredAnimals.value.slice(start, end)
+})
+
+watch([selectedSpecies, selectedSex, searchText], () => {
+  currentPage.value = 1
+})
+const getStatusBadgeClass = (status?: string) => {
+  if (!status) return 'bg-neutral text-neutral-content'
+
+  switch (status.trim()) {
+    case 'Do adopcji':
+      return 'bg-green-100 border border-green-400 text-green-800'
+    case 'Adoptowany internetowo':
+      return 'bg-blue-100 border border-blue-400 text-blue-800'
+    case 'W trakcie leczenia':
+      return 'bg-amber-100 border border-amber-400 text-amber-800'
+    default:
+      return 'bg-neutral text-neutral-content'
+  }
+}
 </script>
 
 <template>
   <div class="max-w-6xl mx-auto px-4 py-6">
-
     <div class="bg-base-100 rounded-2xl border border-base-300 shadow-xl p-6 md:p-8 mb-10">
       <h2 class="text-3xl font-extrabold text-center tracking-tight text-base-content mb-8">
         {{ t('home.title') }}
@@ -86,25 +123,42 @@ const goToDetails = (id?: number) => {
 
       <div class="space-y-6">
         <div>
-          <span class="text-sm font-bold uppercase tracking-wider text-base-content/70 block text-center mb-3">
+          <span
+            class="text-sm font-bold uppercase tracking-wider text-base-content/70 block text-center mb-3"
+          >
             {{ t('home.subtitle') }}
           </span>
           <div class="grid grid-cols-3 gap-3 max-w-xl mx-auto">
             <button
               @click="selectedSpecies = 'Pies'"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Pies' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
+              :class="[
+                'btn btn-md rounded-xl font-bold transition-all border',
+                selectedSpecies === 'Pies'
+                  ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner'
+                  : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200',
+              ]"
             >
               {{ t('animal.dog') }}
             </button>
             <button
               @click="selectedSpecies = 'Kot'"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === 'Kot' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
+              :class="[
+                'btn btn-md rounded-xl font-bold transition-all border',
+                selectedSpecies === 'Kot'
+                  ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner'
+                  : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200',
+              ]"
             >
               {{ t('animal.cat') }}
             </button>
             <button
               @click="resetFilters"
-              :class="['btn btn-md rounded-xl font-bold transition-all border', selectedSpecies === '' && selectedSex === '' && searchText === '' ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner' : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200']"
+              :class="[
+                'btn btn-md rounded-xl font-bold transition-all border',
+                selectedSpecies === '' && selectedSex === '' && searchText === ''
+                  ? '!bg-neutral-300 text-neutral-800 !border-neutral-400 shadow-inner'
+                  : 'btn-outline border-base-300 bg-base-100 hover:!bg-neutral-200',
+              ]"
             >
               {{ t('home.anySpecies') }}
             </button>
@@ -112,7 +166,6 @@ const goToDetails = (id?: number) => {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-base-200 items-end">
-
           <div class="flex flex-col justify-center">
             <span class="text-sm font-bold uppercase tracking-wider text-base-content/70 mb-3">
               {{ t('animal.sex') }}:
@@ -120,19 +173,34 @@ const goToDetails = (id?: number) => {
             <div class="grid grid-cols-3 gap-2 bg-base-200 p-1.5 rounded-xl border border-base-300">
               <button
                 @click="selectedSex = 'M'"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'M' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
+                :class="[
+                  'btn btn-sm rounded-lg border-none font-semibold transition-all',
+                  selectedSex === 'M'
+                    ? '!bg-neutral-300 text-neutral-800 shadow-inner'
+                    : 'bg-transparent text-base-content/80 hover:!bg-neutral-200',
+                ]"
               >
                 {{ t('animal.male') }}
               </button>
               <button
                 @click="selectedSex = 'F'"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === 'F' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
+                :class="[
+                  'btn btn-sm rounded-lg border-none font-semibold transition-all',
+                  selectedSex === 'F'
+                    ? '!bg-neutral-300 text-neutral-800 shadow-inner'
+                    : 'bg-transparent text-base-content/80 hover:!bg-neutral-200',
+                ]"
               >
                 {{ t('animal.female') }}
               </button>
               <button
                 @click="selectedSex = ''"
-                :class="['btn btn-sm rounded-lg border-none font-semibold transition-all', selectedSex === '' ? '!bg-neutral-300 text-neutral-800 shadow-inner' : 'bg-transparent text-base-content/80 hover:!bg-neutral-200']"
+                :class="[
+                  'btn btn-sm rounded-lg border-none font-semibold transition-all',
+                  selectedSex === ''
+                    ? '!bg-neutral-300 text-neutral-800 shadow-inner'
+                    : 'bg-transparent text-base-content/80 hover:!bg-neutral-200',
+                ]"
               >
                 {{ t('home.anyGender') }}
               </button>
@@ -151,35 +219,47 @@ const goToDetails = (id?: number) => {
                 :placeholder="t('home.placeholder')"
                 @keyup.enter="searchAnimal"
               />
-              <button class="btn join-item px-8 font-bold border border-base-300 bg-base-200 hover:bg-base-300" @click="searchAnimal">
+              <button
+                class="btn join-item px-8 font-bold border border-base-300 bg-base-200 hover:bg-base-300"
+                @click="searchAnimal"
+              >
                 {{ t('mainPanel.search') }}
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
     <TransitionGroup
-      v-if="filteredAnimals.length > 0"
+      v-if="paginatedAnimals.length > 0"
       name="fade-cards"
       tag="div"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
     >
       <div
-        v-for="card in filteredAnimals"
+        v-for="card in paginatedAnimals"
         :key="card.id"
         class="card bg-base-100 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-base-200 rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full transform"
         @click="goToDetails(card.animal?.animalId)"
       >
         <figure class="relative h-60 w-full bg-base-200">
           <img
-            :src="formatBase64(card.animal?.photos?.[0]?.base64Data || card.animal?.photo?.[0]?.base64Data || card.animal?.photos?.[0]?.imageData || card.animal?.photo?.[0]?.imageData)"
+            :src="
+              formatBase64(
+                  card.animal?.photo?.[0]?.base64Data ||
+                  card.animal?.photo?.[0]?.imageData,
+              )
+            "
             alt="animal"
             class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
-          <div class="absolute top-3 right-3 badge font-bold px-3 py-2.5 shadow text-xs">
+          <div
+            :class="[
+              'absolute top-3 right-3 badge font-bold px-3 py-2.5 shadow text-xs border-none',
+              getStatusBadgeClass(card.status),
+            ]"
+          >
             {{ card.status }}
           </div>
         </figure>
@@ -189,17 +269,15 @@ const goToDetails = (id?: number) => {
             <h3 class="text-2xl font-black tracking-tight text-base-content">
               {{ card.animal?.name || 'Zwierzak' }}
             </h3>
-            <span class="badge badge-neutral badge-md gap-1 font-semibold">
-              {{ card.animal?.species === 'Pies' ? t('animal.dog') : t('animal.cat') }} •
-              {{ card.animal?.sex === 'M' ? t('animal.male') : t('animal.female') }}
-            </span>
           </div>
 
           <p class="text-base-content/70 text-sm line-clamp-3 leading-relaxed flex-grow mt-1">
             {{ card.animal?.description || '...' }}
           </p>
 
-          <div class="mt-4 pt-3 border-t border-base-200 flex justify-between items-center text-xs font-semibold text-base-content/50">
+          <div
+            class="mt-4 pt-3 border-t border-base-200 flex justify-between items-center text-xs font-semibold text-base-content/50"
+          >
             <span>{{ t('animal.age') }}: {{ card.animal?.age }} lat/a</span>
             <span class="text-primary font-bold inline-flex items-center gap-0.5 text-sm">
               Zobacz profil ➔
@@ -209,64 +287,49 @@ const goToDetails = (id?: number) => {
       </div>
     </TransitionGroup>
 
-    <div v-else class="text-center py-16 bg-base-100 rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6">
-      <p class="text-lg font-medium text-base-content/60 mb-4">{{ t('inputsAndErrors.errChooseSpecies') }}</p>
+    <div
+      v-else
+      class="text-center py-16 bg-base-100 rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6"
+    >
+      <p class="text-lg font-medium text-base-content/60 mb-4">
+        {{ t('inputsAndErrors.errChooseSpecies') }}
+      </p>
       <button class="btn btn-outline font-bold px-6" @click="resetFilters">
         {{ t('home.anySpecies') }}
       </button>
     </div>
-    <TransitionGroup
-      v-if="filteredAnimals.length > 0"
-      name="fade-cards"
-      tag="div"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-    >
-      <div
-        v-for="card in filteredAnimals"
-        :key="card.id"
-        class="card bg-base-100 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-base-200 rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full transform"
-        @click="goToDetails(card.animal?.animalId)"
+
+    <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 mt-12 mb-6">
+      <button
+        class="btn btn-md rounded-xl font-bold border border-base-300 bg-base-100 transition-all hover:!bg-neutral-200"
+        :disabled="currentPage === 1"
+        @click="currentPage--"
       >
-        <figure class="relative h-60 w-full bg-base-200">
-          <img
-            :src="formatBase64(card.animal?.photos?.[0]?.base64Data || card.animal?.photo?.[0]?.base64Data || card.animal?.photos?.[0]?.imageData || card.animal?.photo?.[0]?.imageData)"
-            alt="animal"
-            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-          <div class="absolute top-3 right-3 badge font-bold px-3 py-2.5 shadow text-xs">
-            {{ card.status }}
-          </div>
-        </figure>
+        ◀
+      </button>
 
-        <div class="card-body p-5 flex flex-col flex-grow bg-base-100 text-base-content">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="text-2xl font-black tracking-tight text-base-content">
-              {{ card.animal?.name || 'Zwierzak' }}
-            </h3>
-            <span class="badge badge-neutral badge-md gap-1 font-semibold">
-              {{ card.animal?.species === 'Pies' ? t('animal.dog') : t('animal.cat') }} •
-              {{ card.animal?.sex === 'M' ? t('animal.male') : t('animal.female') }}
-            </span>
-          </div>
-
-          <p class="text-base-content/70 text-sm line-clamp-3 leading-relaxed flex-grow mt-1">
-            {{ card.animal?.description || '...' }}
-          </p>
-
-          <div class="mt-4 pt-3 border-t border-base-200 flex justify-between items-center text-xs font-semibold text-base-content/50">
-            <span>{{ t('animal.age') }}: {{ card.animal?.age }} lat/a</span>
-            <span class="text-primary font-bold inline-flex items-center gap-0.5 text-sm">
-              Zobacz profil ➔
-            </span>
-          </div>
-        </div>
+      <div class="join border border-base-300 rounded-xl overflow-hidden shadow-sm">
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="currentPage = page"
+          :class="[
+            'btn btn-md join-item font-bold border-none transition-all',
+            currentPage === page
+              ? '!bg-neutral-400 text-neutral-900 shadow-inner'
+              : 'bg-base-100 hover:!bg-neutral-200 text-base-content',
+          ]"
+        >
+          {{ page }}
+        </button>
       </div>
-    </TransitionGroup>
 
-    <div v-else class="text-center py-16 bg-base-100 rounded-2xl border border-dashed border-base-300 max-w-2xl mx-auto my-6 shadow-sm p-6">
-      <p class="text-lg font-medium text-base-content/60 mb-4">{{ t('inputsAndErrors.errChooseSpecies') }}</p>
-      <button class="btn btn-outline font-bold px-6" @click="resetFilters">
-        {{ t('home.anySpecies') }}
+      <button
+        class="btn btn-md rounded-xl font-bold border border-base-300 bg-base-100 transition-all hover:!bg-neutral-200"
+        :disabled="currentPage === totalPages"
+        @click="currentPage++"
+      >
+        ▶
       </button>
     </div>
   </div>

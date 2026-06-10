@@ -15,7 +15,7 @@ export interface Animal {
   age: number
   sex: 'M' | 'F'
   description: string
-  photos?: Photo[]
+  photo?: Photo[]
   card?: {
     id: number
     status: string
