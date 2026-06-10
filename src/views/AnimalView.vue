@@ -35,8 +35,8 @@ onMounted(async () => {
 
 // sprawdza czy ma zdjecie (base64) a jak nie to podstawia
 const imageSrc = computed(() => {
-  if (singleAnimal.value?.photos?.[0]?.imageData) {
-    return `data:image/${singleAnimal.value.photos[0].imageExtension};base64,${singleAnimal.value.photos[0].imageData}`
+  if (singleAnimal.value?.photo?.[0]?.imageData) {
+    return `data:image/${singleAnimal.value.photo[0].imageExtension};base64,${singleAnimal.value.photo[0].imageData}`
   }
   return singleAnimal.value?.species === 'Pies' ? dogImage : catImage
 })
@@ -166,13 +166,13 @@ const submitForm = handleSubmit(async (values) => {
           </div>
         </div>
 
-        <div v-if="singleAnimal.photos && singleAnimal.photos.length > 0" class="mt-8">
+        <div v-if="singleAnimal.photo && singleAnimal.photo.length > 0" class="mt-8">
           <h3 class="text-xl font-bold mb-4">
-            {{ t('animal.allPhotos') }} ({{ singleAnimal.photos.length }})
+            {{ t('animal.allPhotos') }} ({{ singleAnimal.photo.length }})
           </h3>
           <div class="flex flex-wrap gap-4">
             <div
-              v-for="(photo, index) in singleAnimal.photos"
+              v-for="(photo, index) in singleAnimal.photo"
               :key="photo.id || index"
               class="border border-base-300 p-2 rounded-box bg-[#FBFBFB]"
             >
